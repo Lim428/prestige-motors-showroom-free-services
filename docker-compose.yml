@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: prestige_motors
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d prestige_motors"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/prestige_motors?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: replace-with-a-strong-random-secret-at-least-32-characters
+      ADMIN_EMAIL: admin@prestigemotors.local
+      ADMIN_PASSWORD: ChangeThisAdminPassword!2026
+      DEALER_NAME: Prestige Motors
+      DEALER_PHONE: "+15551234567"
+      DEALER_WHATSAPP: "+15551234567"
+      DEALER_EMAIL: sales@prestigemotors.local
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - car-uploads:/app/public/uploads/cars
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node server.js"
+
+volumes:
+  postgres-data:
+  car-uploads:

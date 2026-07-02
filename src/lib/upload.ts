@@ -5,7 +5,7 @@ import sharp from "sharp";
 import { hasCloudinaryConfig, uploadImageToCloudinary } from "@/lib/cloudinary";
 import { HttpError } from "@/lib/errors";
 
-const maxFileSize = 8 * 1024 * 1024;
+const maxFileSize = 4 * 1024 * 1024;
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export type UploadedImage = {
@@ -29,7 +29,18 @@ export async function optimizeAndSaveImages(files: File[]) {
     throw new HttpError(422, "Upload up to 12 images at a time.");
   }
 
-  await mkdir(getUploadDirectory(), { recursive: true });
+  const useCloudinary = hasCloudinaryConfig();
+
+  if (!useCloudinary && process.env.VERCEL) {
+    throw new HttpError(
+      500,
+      "Cloudinary is not configured in Vercel. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET."
+    );
+  }
+
+  if (!useCloudinary) {
+    await mkdir(getUploadDirectory(), { recursive: true });
+  }
 
   const images: UploadedImage[] = [];
 
@@ -39,7 +50,7 @@ export async function optimizeAndSaveImages(files: File[]) {
     }
 
     if (file.size > maxFileSize) {
-      throw new HttpError(422, "Each image must be smaller than 8 MB.");
+      throw new HttpError(422, "Each image must be smaller than 4 MB.");
     }
 
     const input = Buffer.from(await file.arrayBuffer());
@@ -55,7 +66,7 @@ export async function optimizeAndSaveImages(files: File[]) {
       .webp({ quality: 84, effort: 5 })
       .toBuffer({ resolveWithObject: true });
 
-    const uploaded = hasCloudinaryConfig()
+    const uploaded = useCloudinary
       ? await uploadImageToCloudinary({ data, filename })
       : null;
 

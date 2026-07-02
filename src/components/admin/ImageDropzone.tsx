@@ -28,6 +28,8 @@ type UploadResponse = {
   error?: string;
 };
 
+const maxFileSize = 4 * 1024 * 1024;
+
 function normalizeImages(images: EditableImage[]) {
   return images.map((image, index) => ({ ...image, sortOrder: index }));
 }
@@ -54,6 +56,13 @@ export function ImageDropzone({
 
   async function upload(files: File[]) {
     if (files.length === 0) {
+      return;
+    }
+
+    const oversizedFile = files.find((file) => file.size > maxFileSize);
+
+    if (oversizedFile) {
+      setError("Each image must be smaller than 4 MB.");
       return;
     }
 
@@ -163,7 +172,7 @@ export function ImageDropzone({
         />
         <UploadCloud className="mx-auto h-8 w-8 text-copper" />
         <p className="mt-3 text-sm font-semibold text-ink">Drop vehicle images here</p>
-        <p className="mt-1 text-xs text-ink/50">JPEG, PNG, or WebP up to 8 MB each</p>
+        <p className="mt-1 text-xs text-ink/50">JPEG, PNG, or WebP up to 4 MB each</p>
         <Button
           type="button"
           variant="secondary"

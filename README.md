@@ -91,7 +91,8 @@ This project can run on free-friendly services:
 Create accounts on Vercel, Neon, and Cloudinary. In Vercel, import the GitHub repository and add these environment variables:
 
 ```bash
-DATABASE_URL="your-neon-postgres-url"
+DATABASE_URL="your-neon-pooled-postgres-url"
+DIRECT_URL="your-neon-direct-postgres-url"
 NEXTAUTH_URL="https://your-vercel-domain.vercel.app"
 NEXTAUTH_SECRET="a-long-random-secret"
 NEXT_PUBLIC_SITE_URL="https://your-vercel-domain.vercel.app"
@@ -114,6 +115,8 @@ npm run vercel-build
 ```
 
 Uploaded car photos go to Cloudinary when the Cloudinary variables are present. Local development still falls back to local file storage.
+
+For Neon, use the pooled connection string for `DATABASE_URL` and the direct connection string for `DIRECT_URL`. Prisma uses `DIRECT_URL` for migrations, which avoids migration lock timeouts on pooled connections.
 
 ## Production Notes
 

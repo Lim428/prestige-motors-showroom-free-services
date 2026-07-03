@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { CheckCircle2, MessageCircle, Phone, ShieldCheck, Sparkles } from "lucide-react";
 import { CarCard } from "@/components/cars/CarCard";
 import { CarGallery } from "@/components/cars/CarGallery";
 import { EnquiryForm } from "@/components/cars/EnquiryForm";
@@ -71,7 +71,7 @@ export default async function CarDetailPage({ params }: Props) {
     vehicleTransmission: titleCaseEnum(car.transmission),
     offers: {
       "@type": "Offer",
-      priceCurrency: "USD",
+      priceCurrency: "MYR",
       price: car.price,
       availability:
         car.status === "SOLD" ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
@@ -81,6 +81,22 @@ export default async function CarDetailPage({ params }: Props) {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <section className="mb-6 grid gap-3 rounded-md border border-ink/10 bg-white px-4 py-4 shadow-sm md:grid-cols-3">
+        {[
+          ["Verified listing", "Photos, status, and specifications are managed by the dealer."],
+          ["Fast response", "Call, WhatsApp, or send a direct enquiry from this page."],
+          ["Buyer assistant", "Use the AI assistant to compare this car with current stock."]
+        ].map(([title, copy]) => (
+          <div key={title} className="flex gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-racing" aria-hidden="true" />
+            <div>
+              <p className="font-black text-ink">{title}</p>
+              <p className="mt-1 text-sm leading-6 text-ink/58">{copy}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(340px,0.7fr)]">
         <section>
           <CarGallery images={car.images} title={carName} />
@@ -155,7 +171,10 @@ export default async function CarDetailPage({ params }: Props) {
         </div>
 
         <div className="rounded-md border border-ink/10 bg-white p-6 shadow-panel">
-          <h2 className="text-xl font-black text-ink">Features</h2>
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-copper" aria-hidden="true" />
+            <h2 className="text-xl font-black text-ink">Features</h2>
+          </div>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {car.features.map((feature) => (
               <li

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { AiAssistant } from "@/components/assistant/AiAssistant";
 import { Header } from "@/components/layout/Header";
 import "@/app/globals.css";
 import { siteUrl } from "@/lib/utils";
@@ -40,6 +41,7 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
+        <AiAssistant />
       </body>
     </html>
   );

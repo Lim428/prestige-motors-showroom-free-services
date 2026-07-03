@@ -80,6 +80,17 @@ export const enquiryUpdateSchema = z.object({
   status: enquiryStatusSchema
 });
 
+export const assistantMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().trim().min(1).max(1200)
+});
+
+export const assistantRequestSchema = z.object({
+  message: z.string().trim().min(1, "Message is required.").max(800),
+  history: z.array(assistantMessageSchema).max(8).default([])
+});
+
 export type CarInput = z.infer<typeof carInputSchema>;
 export type CarQuery = z.infer<typeof carQuerySchema>;
 export type EnquiryInput = z.infer<typeof enquiryInputSchema>;
+export type AssistantRequest = z.infer<typeof assistantRequestSchema>;

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Gauge, Fuel, CalendarDays, Settings2 } from "lucide-react";
+import { ArrowUpRight, Gauge, Fuel, CalendarDays, Settings2 } from "lucide-react";
 import type { SerializedCar } from "@/lib/cars";
 import { formatMileage, titleCaseEnum } from "@/lib/format";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
@@ -10,7 +10,7 @@ export function CarCard({ car, priority = false }: { car: SerializedCar; priorit
   const image = car.images[0];
 
   return (
-    <article className="group overflow-hidden rounded-md border border-ink/10 bg-white shadow-panel transition duration-300 hover:-translate-y-1 hover:shadow-lift">
+    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-ink/10 bg-white shadow-panel transition duration-300 hover:-translate-y-1 hover:shadow-lift">
       <Link href={`/cars/${car.slug}`} className="block">
         <div className="relative aspect-[16/10] overflow-hidden bg-zinc-200">
           {image ? (
@@ -25,7 +25,7 @@ export function CarCard({ car, priority = false }: { car: SerializedCar; priorit
             />
           ) : (
             <div className="grid h-full place-items-center text-sm text-ink/50">
-              Image unavailable
+              Photo coming soon
             </div>
           )}
           <div className="absolute left-4 top-4">
@@ -34,7 +34,7 @@ export function CarCard({ car, priority = false }: { car: SerializedCar; priorit
         </div>
       </Link>
 
-      <div className="p-5">
+      <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-copper">
@@ -74,13 +74,14 @@ export function CarCard({ car, priority = false }: { car: SerializedCar; priorit
           </div>
         </dl>
 
-        <div className="mt-5 flex items-center justify-between border-t border-ink/10 pt-5">
+        <div className="mt-auto flex items-center justify-between border-t border-ink/10 pt-5">
           <span className="text-sm font-medium text-ink/55">{car.condition}</span>
           <Link
             href={`/cars/${car.slug}`}
-            className="text-sm font-bold text-ink transition hover:text-copper"
+            className="inline-flex items-center gap-1 text-sm font-bold text-ink transition hover:text-copper"
           >
             View details
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
       </div>

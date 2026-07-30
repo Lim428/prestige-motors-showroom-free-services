@@ -7,3 +7,5 @@ dist
 *.log
 public/uploads/cars/*
 !public/uploads/cars/.gitkeep
+
+.vercel

@@ -109,7 +109,7 @@ CLOUDINARY_API_KEY="your-api-key"
 CLOUDINARY_API_SECRET="your-api-secret"
 CLOUDINARY_UPLOAD_FOLDER="prestige-motors/cars"
 GEMINI_API_KEY="your-google-ai-studio-gemini-key"
-GEMINI_MODEL="gemini-3.1-flash-lite"
+GEMINI_MODEL="gemini-3.5-flash-lite"
 ```
 
 The Vercel build command runs Prisma migrations and seed/admin setup automatically:
@@ -141,7 +141,7 @@ Step-by-step:
 
 ```bash
 GEMINI_API_KEY="paste-your-key-here"
-GEMINI_MODEL="gemini-3.1-flash-lite"
+GEMINI_MODEL="gemini-3.5-flash-lite"
 ```
 
 8. Make sure the environment is **Production**.

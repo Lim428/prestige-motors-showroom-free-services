@@ -1,11 +1,12 @@
-.env
-.env*.local
+.git
+.github
 .next
 node_modules
 coverage
 dist
 *.log
+.env
+.env.*
+!.env.example
 public/uploads/cars/*
 !public/uploads/cars/.gitkeep
-
-.vercel

@@ -3,7 +3,19 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compare, hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+const nextAuthSecret = process.env.NEXTAUTH_SECRET?.trim();
+
+if (
+  process.env.NODE_ENV === "production" &&
+  (!nextAuthSecret ||
+    nextAuthSecret.length < 32 ||
+    nextAuthSecret.startsWith("replace-with-"))
+) {
+  throw new Error("NEXTAUTH_SECRET must be a unique production secret of at least 32 characters.");
+}
+
 export const authOptions: NextAuthOptions = {
+  secret: nextAuthSecret,
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 8

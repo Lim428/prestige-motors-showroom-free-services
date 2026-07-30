@@ -1,6 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { AiAssistant } from "@/components/assistant/AiAssistant";
-import { Header } from "@/components/layout/Header";
 import "@/app/globals.css";
 import { siteUrl } from "@/lib/utils";
 
@@ -28,7 +26,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f5f2ed"
+  themeColor: "#171714"
 };
 
 export default function RootLayout({
@@ -38,11 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <Header />
-        {children}
-        <AiAssistant />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

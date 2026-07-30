@@ -12,5 +12,10 @@ export function runtimeImageUrl(url: string) {
 }
 
 export function isRuntimeImage(url: string) {
-  return url.startsWith("/uploads/cars/") || url.startsWith("/api/uploads/cars/");
+  return (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("/uploads/cars/") ||
+    url.startsWith("/api/uploads/cars/")
+  );
 }

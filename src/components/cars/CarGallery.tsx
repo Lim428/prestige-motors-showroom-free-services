@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import type { SerializedCarImage } from "@/lib/cars";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
 import { cn } from "@/lib/utils";
@@ -14,11 +15,30 @@ export function CarGallery({
   title: string;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeImage = images[activeIndex] ?? images[0];
+  const thumbnailRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const safeActiveIndex = Math.min(activeIndex, Math.max(images.length - 1, 0));
+  const activeImage = images[safeActiveIndex] ?? images[0];
+  const hasMultipleImages = images.length > 1;
+
+  useEffect(() => {
+    thumbnailRefs.current[safeActiveIndex]?.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "center"
+    });
+  }, [safeActiveIndex]);
+
+  function showPrevious() {
+    setActiveIndex((current) => (current - 1 + images.length) % images.length);
+  }
+
+  function showNext() {
+    setActiveIndex((current) => (current + 1) % images.length);
+  }
 
   return (
-    <div className="space-y-3">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-md bg-zinc-200 shadow-panel">
+    <figure aria-label={`${title} photo gallery`} className="space-y-3">
+      <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-zinc-200 shadow-panel sm:aspect-[16/10]">
         {activeImage ? (
           <Image
             src={runtimeImageUrl(activeImage.url)}
@@ -30,25 +50,75 @@ export function CarGallery({
             className="object-cover"
           />
         ) : (
-          <div className="grid h-full place-items-center text-sm text-ink/50">
-            Image unavailable
+          <div className="grid h-full place-items-center bg-smoke text-center text-ink/50">
+            <div>
+              <ImageIcon className="mx-auto h-8 w-8" aria-hidden="true" />
+              <p className="mt-3 text-sm font-semibold">Photography coming soon</p>
+            </div>
           </div>
         )}
+
+        {hasMultipleImages ? (
+          <>
+            <button
+              type="button"
+              onClick={showPrevious}
+              className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/35 bg-ink/55 text-white shadow-lg backdrop-blur transition hover:bg-ink/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:left-4"
+              aria-label={`Show previous ${title} photo`}
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={showNext}
+              className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/35 bg-ink/55 text-white shadow-lg backdrop-blur transition hover:bg-ink/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:right-4"
+              aria-label={`Show next ${title} photo`}
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </>
+        ) : null}
+
+        {images.length > 0 ? (
+          <div
+            className="absolute bottom-3 right-3 rounded-full border border-white/25 bg-ink/65 px-3 py-1.5 text-xs font-bold tabular-nums text-white backdrop-blur sm:bottom-4 sm:right-4"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {safeActiveIndex + 1} / {images.length}
+          </div>
+        ) : null}
       </div>
 
-      {images.length > 1 ? (
-        <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+      {activeImage ? (
+        <figcaption className="flex items-start justify-between gap-4 px-1 text-xs text-ink/50">
+          <span className="line-clamp-1">{activeImage.altText}</span>
+          <span className="shrink-0 font-semibold text-ink/65">
+            Dealer photography
+          </span>
+        </figcaption>
+      ) : null}
+
+      {hasMultipleImages ? (
+        <div
+          className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2"
+          aria-label={`${title} thumbnails`}
+        >
           {images.map((image, index) => (
             <button
               key={image.id}
+              ref={(node) => {
+                thumbnailRefs.current[index] = node;
+              }}
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`Show ${title} image ${index + 1}`}
+              aria-pressed={safeActiveIndex === index}
               className={cn(
-                "relative aspect-[4/3] overflow-hidden rounded-md border bg-white transition",
-                activeIndex === index
-                  ? "border-ink shadow-panel"
-                  : "border-ink/10 opacity-75 hover:opacity-100"
+                "relative aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-xl border-2 bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/50 focus-visible:ring-offset-2 sm:w-28",
+                safeActiveIndex === index
+                  ? "border-copper shadow-panel"
+                  : "border-transparent opacity-60 hover:opacity-100"
               )}
             >
               <Image
@@ -63,6 +133,6 @@ export function CarGallery({
           ))}
         </div>
       ) : null}
-    </div>
+    </figure>
   );
 }

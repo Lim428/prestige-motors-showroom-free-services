@@ -239,10 +239,25 @@ const cars = [
 ] as const;
 
 async function main() {
-  const adminEmail = (process.env.ADMIN_EMAIL ?? "admin@prestigemotors.local")
-    .toLowerCase()
-    .trim();
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "ChangeThisAdminPassword!2026";
+  const defaultAdminEmail = "admin@prestigemotors.local";
+  const defaultAdminPassword = "ChangeThisAdminPassword!2026";
+  const configuredAdminEmail = process.env.ADMIN_EMAIL?.trim();
+  const configuredAdminPassword = process.env.ADMIN_PASSWORD;
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    (!configuredAdminEmail ||
+      !configuredAdminPassword ||
+      configuredAdminPassword === defaultAdminPassword ||
+      configuredAdminPassword.length < 16)
+  ) {
+    throw new Error(
+      "Production seeding requires ADMIN_EMAIL and a unique ADMIN_PASSWORD of at least 16 characters."
+    );
+  }
+
+  const adminEmail = (configuredAdminEmail ?? defaultAdminEmail).toLowerCase();
+  const adminPassword = configuredAdminPassword ?? defaultAdminPassword;
   const passwordHash = await hash(adminPassword, 12);
 
   await prisma.user.upsert({

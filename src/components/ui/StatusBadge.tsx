@@ -5,20 +5,20 @@ import { titleCaseEnum } from "@/lib/format";
 type Status = CarStatus | EnquiryStatus;
 
 const styles: Record<Status, string> = {
-  AVAILABLE: "bg-racing/10 text-racing ring-racing/20",
-  RESERVED: "bg-champagne/20 text-amber-800 ring-champagne/30",
-  SOLD: "bg-zinc-200 text-zinc-700 ring-zinc-300",
-  NEW: "bg-racing/10 text-racing ring-racing/20",
-  CONTACTED: "bg-blue-50 text-blue-700 ring-blue-100",
-  CLOSED: "bg-zinc-100 text-zinc-700 ring-zinc-200",
-  ARCHIVED: "bg-zinc-100 text-zinc-500 ring-zinc-200"
+  AVAILABLE: "bg-emerald-50 text-emerald-800 ring-emerald-200 before:bg-emerald-600",
+  RESERVED: "bg-amber-50 text-amber-900 ring-amber-200 before:bg-amber-600",
+  SOLD: "bg-zinc-100 text-zinc-700 ring-zinc-200 before:bg-zinc-500",
+  NEW: "bg-emerald-50 text-emerald-800 ring-emerald-200 before:bg-emerald-600",
+  CONTACTED: "bg-blue-50 text-blue-800 ring-blue-200 before:bg-blue-600",
+  CLOSED: "bg-zinc-100 text-zinc-700 ring-zinc-200 before:bg-zinc-500",
+  ARCHIVED: "bg-stone-100 text-stone-600 ring-stone-200 before:bg-stone-400"
 };
 
 export function StatusBadge({ status, className }: { status: Status; className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ring-1",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.12em] ring-1 before:h-1.5 before:w-1.5 before:rounded-full before:content-['']",
         styles[status],
         className
       )}

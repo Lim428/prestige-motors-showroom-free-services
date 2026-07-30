@@ -24,6 +24,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/prestige_motors?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@postgres:5432/prestige_motors?schema=public
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: replace-with-a-strong-random-secret-at-least-32-characters
       ADMIN_EMAIL: admin@prestigemotors.local
@@ -32,7 +33,11 @@ services:
       DEALER_PHONE: "+15551234567"
       DEALER_WHATSAPP: "+15551234567"
       DEALER_EMAIL: sales@prestigemotors.local
+      DEALER_ADDRESS: "${DEALER_ADDRESS:-}"
+      DEALER_HOURS: "${DEALER_HOURS:-}"
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.5-flash-lite}"
     ports:
       - "3000:3000"
     volumes:

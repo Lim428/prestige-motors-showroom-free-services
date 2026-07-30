@@ -9,16 +9,36 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#111111",
-        graphite: "#242424",
-        smoke: "#f5f2ed",
-        champagne: "#d8b46a",
-        copper: "#b45f3c",
-        racing: "#0d5c46"
+        ink: "#171714",
+        graphite: "#272621",
+        smoke: "#f4f1e9",
+        porcelain: "#fbfaf7",
+        champagne: "#d4b56f",
+        copper: "#8f452a",
+        racing: "#0f5847",
+        muted: "#69675f",
+        line: "#ddd8cc"
+      },
+      fontFamily: {
+        display: [
+          "\"Arial Narrow\"",
+          "\"Aptos Display\"",
+          "\"Helvetica Neue\"",
+          "Arial",
+          "sans-serif"
+        ],
+        sans: [
+          "\"Aptos\"",
+          "\"Segoe UI\"",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif"
+        ]
       },
       boxShadow: {
-        lift: "0 24px 70px rgba(17, 17, 17, 0.12)",
-        panel: "0 18px 60px rgba(17, 17, 17, 0.08)"
+        lift: "0 28px 80px rgba(23, 23, 20, 0.14)",
+        panel: "0 14px 44px rgba(23, 23, 20, 0.07)",
+        soft: "0 6px 24px rgba(23, 23, 20, 0.06)"
       },
       keyframes: {
         "fade-up": {
@@ -31,7 +51,7 @@ const config: Config = {
         }
       },
       animation: {
-        "fade-up": "fade-up 520ms ease-out both",
+        "fade-up": "fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both",
         shimmer: "shimmer 1.6s linear infinite"
       }
     }

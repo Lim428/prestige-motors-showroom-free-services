@@ -55,6 +55,7 @@ export default async function AdminPage() {
     <AdminDashboard
       initialCars={cars.map(serializeCar)}
       initialEnquiries={serializedEnquiries}
+      adminName={session.user.name ?? session.user.email ?? "Administrator"}
     />
   );
 }

@@ -5,7 +5,7 @@ export function formatPrice(value: number) {
 }
 
 export function formatMileage(value: number) {
-  return `${number.format(value)} mi`;
+  return `${number.format(value)} km`;
 }
 
 export function titleCaseEnum(value: string) {

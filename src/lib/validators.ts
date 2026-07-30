@@ -3,6 +3,11 @@ import { z } from "zod";
 export const transmissionSchema = z.enum(["AUTOMATIC", "MANUAL"]);
 export const fuelTypeSchema = z.enum(["PETROL", "DIESEL", "HYBRID", "ELECTRIC"]);
 export const carStatusSchema = z.enum(["AVAILABLE", "RESERVED", "SOLD"]);
+export const carStatusUpdateSchema = z
+  .object({
+    status: carStatusSchema
+  })
+  .strict();
 export const enquiryStatusSchema = z.enum([
   "NEW",
   "CONTACTED",

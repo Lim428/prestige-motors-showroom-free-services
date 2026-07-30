@@ -1,31 +1,72 @@
 import { clsx, type ClassValue } from "clsx";
 
+const placeholderValuePattern =
+  /^(?:your(?:[-_\s]|$)|replace(?:[-_\s]|$)|change[-_\s]?this|todo\b|tbd\b|example\b)/i;
+const defaultDealerPhone = "+60312345678";
+
+function configuredValue(value: string | undefined) {
+  const normalized = value?.trim();
+
+  if (!normalized || placeholderValuePattern.test(normalized)) {
+    return null;
+  }
+
+  return normalized;
+}
+
+function normalizeDialablePhone(value: string | undefined) {
+  const compact = configuredValue(value)?.replace(/[\s().-]/g, "");
+
+  return compact && /^\+?\d{8,15}$/.test(compact) ? compact : null;
+}
+
+function whatsAppDigits(value: string | undefined) {
+  const digits = normalizeDialablePhone(value)?.replace(/^\+/, "");
+
+  return digits && /^[1-9]\d{7,14}$/.test(digits) ? digits : null;
+}
+
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
 export function dealerPhone() {
-  return process.env.DEALER_PHONE ?? "+60312345678";
+  return normalizeDialablePhone(process.env.DEALER_PHONE) ?? defaultDealerPhone;
 }
 
 export function dealerWhatsApp() {
-  return (process.env.DEALER_WHATSAPP ?? dealerPhone()).replace(/[^\d]/g, "");
+  return (
+    whatsAppDigits(process.env.DEALER_WHATSAPP) ??
+    whatsAppDigits(dealerPhone()) ??
+    defaultDealerPhone.replace(/^\+/, "")
+  );
 }
 
 export function dealerName() {
-  return process.env.DEALER_NAME?.trim() || "Prestige Motors";
+  return configuredValue(process.env.DEALER_NAME) ?? "Prestige Motors";
 }
 
 export function dealerEmail() {
-  return process.env.DEALER_EMAIL?.trim() || null;
+  const email = configuredValue(process.env.DEALER_EMAIL);
+
+  if (
+    !email ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+    /\.(?:local|invalid)$/i.test(email) ||
+    /@example\.(?:com|org|net)$/i.test(email)
+  ) {
+    return null;
+  }
+
+  return email;
 }
 
 export function dealerAddress() {
-  return process.env.DEALER_ADDRESS?.trim() || null;
+  return configuredValue(process.env.DEALER_ADDRESS);
 }
 
 export function dealerHours() {
-  return process.env.DEALER_HOURS?.trim() || null;
+  return configuredValue(process.env.DEALER_HOURS);
 }
 
 export function dealerPhoneDisplay() {
@@ -43,9 +84,6 @@ export function dealerPhoneDisplay() {
 export function siteUrl() {
   const rawUrl =
     process.env.NEXTAUTH_URL ??
-    (process.env.RAILWAY_PUBLIC_DOMAIN
-      ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-      : undefined) ??
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : undefined) ??

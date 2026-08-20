@@ -2,7 +2,9 @@
 
 import { FormEvent, useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Bot, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { Bot, MessageCircle, Send, Sparkles, UserRound, X } from "lucide-react";
+import { LeadCaptureCard } from "@/components/growth/LeadCaptureCard";
+import { trackEngagement } from "@/lib/clientAnalytics";
 import { cn } from "@/lib/utils";
 
 type ChatMessage = {
@@ -15,6 +17,7 @@ type AssistantResponse = {
     reply: string;
     mode: "ai" | "basic";
     reason?: "not_configured" | "provider_error";
+    carIds?: string[];
   };
   error?: string;
 };
@@ -73,6 +76,8 @@ export function AiAssistant() {
   const [error, setError] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [assistantMode, setAssistantMode] = useState<"ai" | "basic" | null>(null);
+  const [suggestedCarIds, setSuggestedCarIds] = useState<string[]>([]);
+  const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [assistantReason, setAssistantReason] = useState<
     "not_configured" | "provider_error" | null
   >(null);
@@ -82,6 +87,7 @@ export function AiAssistant() {
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const requestInFlightRef = useRef(false);
+  const hasTrackedOpenRef = useRef(false);
   const titleId = useId();
   const inputHelpId = useId();
   const isVehicleDetail = pathname.startsWith("/cars/");
@@ -188,6 +194,9 @@ export function AiAssistant() {
 
       setAssistantMode(result.data.mode);
       setAssistantReason(result.data.reason ?? null);
+      setSuggestedCarIds((current) =>
+        Array.from(new Set([...current, ...(result.data?.carIds ?? [])])).slice(0, 4)
+      );
       setMessages((current) => [
         ...current,
         {
@@ -211,6 +220,11 @@ export function AiAssistant() {
   function openAssistant() {
     returnFocusRef.current = launcherRef.current;
     setIsOpen(true);
+
+    if (!hasTrackedOpenRef.current) {
+      hasTrackedOpenRef.current = true;
+      trackEngagement("AI_CHAT_STARTED");
+    }
   }
 
   function closeAssistant() {
@@ -328,6 +342,35 @@ export function AiAssistant() {
                     Checking the showroom
                   </div>
                 </div>
+              ) : null}
+
+              {messages.some((message) => message.role === "user") ? (
+                showLeadCapture ? (
+                  <LeadCaptureCard
+                    transcript={messages.slice(1)}
+                    vehicleIds={suggestedCarIds}
+                    className="shadow-none"
+                    onSuccess={() => setShowLeadCapture(true)}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowLeadCapture(true)}
+                    className="flex w-full items-center gap-3 rounded-2xl border border-racing/15 bg-racing/5 p-3 text-left transition hover:border-racing/30 hover:bg-racing/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/25"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-racing text-white">
+                      <UserRound className="h-4 w-4" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-black text-ink">
+                        Continue with the showroom
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-5 text-ink/55">
+                        Send this conversation so you do not need to repeat it.
+                      </span>
+                    </span>
+                  </button>
+                )
               ) : null}
 
               <div ref={messagesEndRef} aria-hidden="true" />

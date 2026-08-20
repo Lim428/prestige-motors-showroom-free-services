@@ -37,9 +37,9 @@ export async function adminFetch<T>(
 
   if (response.status === 401 || response.status === 403) {
     const callbackUrl = `${window.location.pathname}${window.location.search}`;
-    window.location.assign(
-      `/admin/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
-    );
+    const signInUrl = new URL("/admin/login", window.location.origin);
+    signInUrl.searchParams.set("callbackUrl", callbackUrl);
+    window.location.assign(signInUrl.href);
     throw new AdminRequestError("Your session expired. Redirecting to sign in.");
   }
 

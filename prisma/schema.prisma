@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -37,35 +37,158 @@ enum EnquiryStatus {
   ARCHIVED
 }
 
+enum LeadStatus {
+  NEW
+  QUALIFIED
+  CONTACTED
+  APPOINTMENT_SET
+  NEGOTIATING
+  WON
+  LOST
+  ARCHIVED
+}
+
+enum LeadSource {
+  AI_ASSISTANT
+  WEBSITE
+  WHATSAPP
+  ENQUIRY
+  TEST_DRIVE
+  TRADE_IN
+  MANUAL
+}
+
+enum LeadPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum AppointmentStatus {
+  REQUESTED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  TEST_DRIVE
+  SHOWROOM_VISIT
+  VIDEO_CALL
+}
+
+enum TradeInStatus {
+  SUBMITTED
+  REVIEWING
+  APPRAISED
+  ACCEPTED
+  DECLINED
+  ARCHIVED
+}
+
+enum AlertType {
+  PRICE_DROP
+  NEW_STOCK
+  BOTH
+}
+
+enum AlertChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum AlertStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  PAUSED
+  MATCHED
+  UNSUBSCRIBED
+}
+
+enum NotificationType {
+  NEW_LEAD
+  APPOINTMENT_REQUEST
+  TRADE_IN_SUBMITTED
+  STOCK_ALERT_CREATED
+  FOLLOW_UP_DUE
+  ALERT_MATCHED
+  SYSTEM
+}
+
+enum AnalyticsEventName {
+  PAGE_VIEW
+  VEHICLE_VIEW
+  WHATSAPP_CLICK
+  PHONE_CLICK
+  GALLERY_INTERACTION
+  ENQUIRY_SUBMITTED
+  AI_CHAT_STARTED
+  AI_LEAD_CAPTURED
+  FINANCE_CALCULATED
+  COMPARE_USED
+  CAR_SAVED
+  TEST_DRIVE_BOOKED
+  TRADE_IN_SUBMITTED
+  STOCK_ALERT_CREATED
+  TRUST_REPORT_DOWNLOADED
+}
+
+enum InspectionStatus {
+  NOT_INSPECTED
+  IN_PROGRESS
+  VERIFIED
+  NEEDS_ATTENTION
+}
+
+enum TrustDocumentCategory {
+  INSPECTION_REPORT
+  SERVICE_RECORD
+  WARRANTY
+  CERTIFICATE
+  OTHER
+}
+
 model User {
-  id           String   @id @default(uuid())
-  name         String?
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(ADMIN)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String     @id @default(uuid())
+  name          String?
+  email         String     @unique
+  passwordHash  String
+  role          Role       @default(ADMIN)
+  assignedLeads Lead[]     @relation("LeadAssignee")
+  leadNotes     LeadNote[] @relation("LeadNoteAuthor")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 model Car {
-  id           String       @id @default(uuid())
-  slug         String       @unique
-  brand        String
-  model        String
-  year         Int
-  mileage      Int
-  transmission Transmission
-  fuelType     FuelType
-  engine       String
-  price        Decimal      @db.Decimal(12, 2)
-  condition    String
-  description  String       @db.Text
-  features     String[]
-  status       CarStatus    @default(AVAILABLE)
-  images       CarImage[]
-  enquiries    Enquiry[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id              String               @id @default(uuid())
+  slug            String               @unique
+  brand           String
+  model           String
+  year            Int
+  mileage         Int
+  transmission    Transmission
+  fuelType        FuelType
+  engine          String
+  price           Decimal              @db.Decimal(12, 2)
+  condition       String
+  description     String               @db.Text
+  features        String[]
+  status          CarStatus            @default(AVAILABLE)
+  images          CarImage[]
+  enquiries       Enquiry[]
+  leads           Lead[]
+  appointments    Appointment[]
+  stockAlerts     StockAlert[]
+  analyticsEvents AnalyticsEvent[]
+  priceHistory    PriceHistory[]
+  trustProfile    VehicleTrustProfile?
+  trustDocuments  TrustDocument[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@index([brand])
   @@index([year])
@@ -94,13 +217,247 @@ model Enquiry {
   name      String
   email     String
   phone     String?
-  message   String       @db.Text
+  message   String        @db.Text
   status    EnquiryStatus @default(NEW)
   carId     String?
-  car       Car?         @relation(fields: [carId], references: [id], onDelete: SetNull)
+  car       Car?          @relation(fields: [carId], references: [id], onDelete: SetNull)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
   @@index([status])
   @@index([carId])
+}
+
+model Lead {
+  id              String        @id @default(uuid())
+  name            String
+  email           String
+  phone           String?
+  source          LeadSource    @default(WEBSITE)
+  status          LeadStatus    @default(NEW)
+  priority        LeadPriority  @default(NORMAL)
+  summary         String?       @db.Text
+  transcript      Json?
+  budgetMin       Decimal?      @db.Decimal(12, 2)
+  budgetMax       Decimal?      @db.Decimal(12, 2)
+  preferredCarIds String[]
+  nextFollowUpAt  DateTime?
+  consentAt       DateTime
+  carId           String?
+  car             Car?          @relation(fields: [carId], references: [id], onDelete: SetNull)
+  assignedToId    String?
+  assignedTo      User?         @relation("LeadAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  notes           LeadNote[]
+  appointments    Appointment[]
+  tradeIns        TradeIn[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status, createdAt])
+  @@index([priority, createdAt])
+  @@index([source, createdAt])
+  @@index([email])
+  @@index([carId])
+  @@index([assignedToId])
+  @@index([nextFollowUpAt])
+}
+
+model LeadNote {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?    @relation("LeadNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([leadId, createdAt])
+  @@index([authorId])
+}
+
+model Appointment {
+  id        String            @id @default(uuid())
+  type      AppointmentType   @default(TEST_DRIVE)
+  status    AppointmentStatus @default(REQUESTED)
+  name      String
+  email     String
+  phone     String
+  notes     String?           @db.Text
+  startAt   DateTime
+  endAt     DateTime
+  timezone  String            @default("Asia/Kuala_Lumpur")
+  consentAt DateTime
+  carId     String?
+  car       Car?              @relation(fields: [carId], references: [id], onDelete: SetNull)
+  leadId    String?
+  lead      Lead?             @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([startAt, status])
+  @@index([carId, startAt])
+  @@index([leadId])
+  @@index([email])
+}
+
+model TradeIn {
+  id              String         @id @default(uuid())
+  status          TradeInStatus  @default(SUBMITTED)
+  name            String
+  email           String
+  phone           String
+  make            String
+  model           String
+  year            Int
+  mileage         Int
+  registration    String?
+  condition       String
+  expectedPrice   Decimal?       @db.Decimal(12, 2)
+  appraisalAmount Decimal?       @db.Decimal(12, 2)
+  notes           String?        @db.Text
+  adminNotes      String?        @db.Text
+  consentAt       DateTime
+  leadId          String?
+  lead            Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  images          TradeInImage[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@index([leadId])
+}
+
+model TradeInImage {
+  id        String   @id @default(uuid())
+  url       String
+  publicId  String?
+  altText   String?
+  sortOrder Int      @default(0)
+  tradeInId String
+  tradeIn   TradeIn  @relation(fields: [tradeInId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([tradeInId, sortOrder])
+}
+
+model StockAlert {
+  id                    String       @id @default(uuid())
+  name                  String?
+  email                 String
+  phone                 String?
+  channel               AlertChannel @default(EMAIL)
+  type                  AlertType    @default(NEW_STOCK)
+  status                AlertStatus  @default(PENDING_VERIFICATION)
+  brand                 String?
+  model                 String?
+  fuelType              FuelType?
+  minPrice              Decimal?     @db.Decimal(12, 2)
+  maxPrice              Decimal?     @db.Decimal(12, 2)
+  consentAt             DateTime
+  verificationToken     String       @unique @default(uuid())
+  verificationExpiresAt DateTime?
+  verifiedAt            DateTime?
+  unsubscribeToken      String       @unique @default(uuid())
+  lastCheckedAt         DateTime?
+  lastMatchedAt         DateTime?
+  lastKnownCarStatus    CarStatus?
+  carId                 String?
+  car                   Car?         @relation(fields: [carId], references: [id], onDelete: SetNull)
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  @@index([status, type])
+  @@index([status, lastCheckedAt])
+  @@index([email])
+  @@index([carId])
+  @@index([brand, model])
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  type       NotificationType
+  title      String
+  message    String           @db.Text
+  actionUrl  String?
+  entityType String?
+  entityId   String?
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+
+  @@index([readAt, createdAt])
+  @@index([type, createdAt])
+  @@index([entityType, entityId])
+}
+
+model AnalyticsEvent {
+  id        String             @id @default(uuid())
+  event     AnalyticsEventName
+  sessionId String?
+  path      String?
+  referrer  String?
+  metadata  Json?
+  carId     String?
+  car       Car?               @relation(fields: [carId], references: [id], onDelete: SetNull)
+  createdAt DateTime           @default(now())
+
+  @@index([event, createdAt])
+  @@index([carId, event, createdAt])
+  @@index([sessionId, createdAt])
+}
+
+model ApiRateLimit {
+  key       String   @id @db.VarChar(128)
+  count     Int      @default(1)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+}
+
+model PriceHistory {
+  id            String   @id @default(uuid())
+  previousPrice Decimal? @db.Decimal(12, 2)
+  price         Decimal  @db.Decimal(12, 2)
+  reason        String?
+  carId         String
+  car           Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  recordedAt    DateTime @default(now())
+
+  @@index([carId, recordedAt])
+}
+
+model VehicleTrustProfile {
+  id                    String           @id @default(uuid())
+  carId                 String           @unique
+  car                   Car              @relation(fields: [carId], references: [id], onDelete: Cascade)
+  inspectionStatus      InspectionStatus @default(NOT_INSPECTED)
+  inspectionScore       Int?
+  inspectionSummary     String?          @db.Text
+  serviceHistorySummary String?          @db.Text
+  warrantyMonths        Int?
+  warrantyProvider      String?
+  ownershipCount        Int?
+  accidentFree          Boolean?
+  lastInspectedAt       DateTime?
+  reportUrl             String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  @@index([inspectionStatus])
+}
+
+model TrustDocument {
+  id        String                @id @default(uuid())
+  category  TrustDocumentCategory
+  title     String
+  url       String
+  issuedAt  DateTime?
+  expiresAt DateTime?
+  verified  Boolean               @default(false)
+  carId     String
+  car       Car                   @relation(fields: [carId], references: [id], onDelete: Cascade)
+  createdAt DateTime              @default(now())
+
+  @@index([carId, category])
 }

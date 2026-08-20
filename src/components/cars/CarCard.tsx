@@ -5,17 +5,18 @@ import type { SerializedCar } from "@/lib/cars";
 import { formatMileage, titleCaseEnum } from "@/lib/format";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { SaveCompareControls } from "@/components/growth/SaveCompareControls";
 
 export function CarCard({ car, priority = false }: { car: SerializedCar; priority?: boolean }) {
   const image = car.images[0];
   const carName = `${car.year} ${car.brand} ${car.model}`;
 
   return (
-    <article className="h-full">
+    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-ink/10 bg-white shadow-panel transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lift motion-reduce:transition-none">
       <Link
         href={`/cars/${car.slug}`}
         aria-label={`View ${carName}`}
-        className="group flex h-full flex-col overflow-hidden rounded-md border border-ink/10 bg-white shadow-panel transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-4 focus-visible:ring-offset-smoke motion-reduce:transition-none"
+        className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-racing"
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-zinc-200">
           {image ? (
@@ -89,6 +90,13 @@ export function CarCard({ car, priority = false }: { car: SerializedCar; priorit
           </div>
         </div>
       </Link>
+      <div className="border-t border-ink/10 px-5 py-4 sm:px-6">
+        <SaveCompareControls
+          car={car}
+          compact
+          showCompareLink={false}
+        />
+      </div>
     </article>
   );
 }

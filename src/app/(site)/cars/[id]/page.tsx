@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   ArrowUpRight,
+  CalendarDays,
   Check,
   CheckCircle2,
   MessageCircle,
@@ -14,6 +15,12 @@ import {
 import { CarCard } from "@/components/cars/CarCard";
 import { CarGallery } from "@/components/cars/CarGallery";
 import { EnquiryForm } from "@/components/cars/EnquiryForm";
+import { FinanceCalculator } from "@/components/growth/FinanceCalculator";
+import { SaveCompareControls } from "@/components/growth/SaveCompareControls";
+import { StockAlertForm } from "@/components/growth/StockAlertForm";
+import { TrustPack } from "@/components/growth/TrustPack";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { TrackedContactLink } from "@/components/analytics/TrackedContactLink";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatMileage, titleCaseEnum } from "@/lib/format";
 import { getCarBySlugOrId, getRelatedCars } from "@/lib/cars";
@@ -131,6 +138,7 @@ export default async function CarDetailPage({ params }: Props) {
 
   return (
     <main className="pb-32 sm:pb-16">
+      <AnalyticsTracker event="VEHICLE_VIEW" carId={car.id} />
       <div className="mx-auto max-w-7xl px-4 pb-8 pt-5 sm:px-6 sm:pt-8 lg:px-8">
         <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-sm">
           <Link
@@ -174,13 +182,14 @@ export default async function CarDetailPage({ params }: Props) {
                 {car.formattedPrice}
               </p>
               <p className="mt-2 text-xs text-ink/45">Final availability confirmed by dealer</p>
+              <SaveCompareControls car={car} className="mt-4 sm:justify-end" compact />
             </div>
           </div>
         </header>
 
         <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.65fr)] lg:gap-10">
           <section aria-label={`${carName} photography`}>
-            <CarGallery images={car.images} title={carName} />
+            <CarGallery carId={car.id} images={car.images} title={carName} />
           </section>
 
           <aside className="space-y-6">
@@ -219,12 +228,19 @@ export default async function CarDetailPage({ params }: Props) {
                       {availability.phoneLabel}
                     </Link>
                   ) : (
-                    <a href={`tel:${dealerPhone()}`} className={primaryContactClass}>
+                    <TrackedContactLink
+                      carId={car.id}
+                      channel="phone"
+                      href={`tel:${dealerPhone()}`}
+                      className={primaryContactClass}
+                    >
                       <Phone className="h-4 w-4" aria-hidden="true" />
                       {availability.phoneLabel}
-                    </a>
+                    </TrackedContactLink>
                   )}
-                  <a
+                  <TrackedContactLink
+                    carId={car.id}
+                    channel="whatsapp"
                     href={whatsappUrl}
                     target="_blank"
                     rel="noreferrer"
@@ -232,8 +248,18 @@ export default async function CarDetailPage({ params }: Props) {
                   >
                     <MessageCircle className="h-4 w-4" aria-hidden="true" />
                     {availability.whatsappLabel}
-                  </a>
+                  </TrackedContactLink>
                 </div>
+
+                {!isSold ? (
+                  <Link
+                    href={`/book-test-drive?carId=${car.id}`}
+                    className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-ink/15 bg-smoke px-4 text-sm font-black text-ink transition hover:border-ink/30 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2"
+                  >
+                    <CalendarDays className="h-4 w-4 text-copper" aria-hidden="true" />
+                    Book a test drive
+                  </Link>
+                ) : null}
 
                 <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-ink/45">
                   <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-racing" aria-hidden="true" />
@@ -243,6 +269,13 @@ export default async function CarDetailPage({ params }: Props) {
             </section>
 
             <EnquiryForm carId={car.id} carName={carName} carStatus={car.status} />
+            <StockAlertForm
+              carId={car.id}
+              initialBrand={car.brand}
+              initialModel={car.model}
+              initialMaxPrice={car.price}
+              compact
+            />
           </aside>
         </div>
 
@@ -277,6 +310,8 @@ export default async function CarDetailPage({ params }: Props) {
             </div>
           ))}
         </section>
+
+        <TrustPack carId={car.id} vehicleName={carName} className="mt-10" />
 
         <section className="mt-14 grid gap-10 border-y border-ink/10 py-12 lg:grid-cols-[0.6fr_1.4fr] lg:gap-16 lg:py-16">
           <div>
@@ -317,6 +352,34 @@ export default async function CarDetailPage({ params }: Props) {
               </ul>
             </div>
           </div>
+        </section>
+
+        <FinanceCalculator
+          price={car.price}
+          carId={car.id}
+          vehicleName={carName}
+          className="mt-14 sm:mt-16"
+        />
+
+        <section className="mt-8 flex flex-col gap-5 rounded-[1.5rem] border border-ink/10 bg-white p-6 shadow-panel sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-copper">
+              Already own a car?
+            </p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">
+              Put its value toward your next move.
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/55">
+              Send the appraisal team your vehicle details and photos for a no-obligation trade-in review.
+            </p>
+          </div>
+          <Link
+            href="/trade-in"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-ink px-5 text-sm font-black text-white transition hover:bg-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/25 focus-visible:ring-offset-2"
+          >
+            Start trade-in appraisal
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </section>
 
         {related.length > 0 ? (
@@ -364,15 +427,19 @@ export default async function CarDetailPage({ params }: Props) {
               Stock
             </Link>
           ) : (
-            <a
+            <TrackedContactLink
+              carId={car.id}
+              channel="phone"
               href={`tel:${dealerPhone()}`}
               className="inline-flex h-11 items-center justify-center gap-1.5 rounded-xl bg-ink px-3 text-xs font-black text-white"
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
               Call
-            </a>
+            </TrackedContactLink>
           )}
-          <a
+          <TrackedContactLink
+            carId={car.id}
+            channel="whatsapp"
             href={whatsappUrl}
             target="_blank"
             rel="noreferrer"
@@ -380,7 +447,7 @@ export default async function CarDetailPage({ params }: Props) {
           >
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
             {isSold ? "Source" : "WhatsApp"}
-          </a>
+          </TrackedContactLink>
         </div>
       </div>
 

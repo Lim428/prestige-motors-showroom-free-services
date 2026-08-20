@@ -17,12 +17,15 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.44",
     "@prisma/client": "5.22.0",
+    "ai": "^7.0.65",
     "bcryptjs": "2.4.3",
     "clsx": "2.1.1",
     "lucide-react": "1.22.0",
-    "next": "16.2.9",
-    "next-auth": "4.24.14",
+    "next": "16.3.1",
+    "next-auth": "4.24.15",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "sharp": "0.35.2",
@@ -35,15 +38,15 @@
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.5.2",
     "eslint": "9.39.4",
-    "eslint-config-next": "16.2.9",
-    "postcss": "8.5.16",
+    "eslint-config-next": "16.3.1",
+    "postcss": "8.5.26",
     "prisma": "5.22.0",
     "tailwindcss": "3.4.17",
     "tsx": "4.22.4",
     "typescript": "6.0.3"
   },
   "overrides": {
-    "postcss": "8.5.16",
+    "postcss": "8.5.26",
     "uuid": "11.1.1"
   },
   "prisma": {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, MessageCircle, Phone } from "lucide-react";
+import { TrackedContactLink } from "@/components/analytics/TrackedContactLink";
 import {
   dealerEmail,
   dealerName,
@@ -51,7 +52,10 @@ export function Footer() {
               {[
                 ["Home", "/"],
                 ["Browse inventory", "/#inventory"],
-                ["Why Prestige", "/#experience"],
+                ["Compare saved cars", "/compare"],
+                ["Book a test drive", "/book-test-drive"],
+                ["Trade in your car", "/trade-in"],
+                ["Create a stock alert", "/#buyer-tools"],
                 ["Dealer login", "/admin/login"]
               ].map(([label, href]) => (
                 <li key={label}>
@@ -71,14 +75,16 @@ export function Footer() {
               Talk to the showroom
             </p>
             <div className="mt-4 space-y-3">
-              <a
+              <TrackedContactLink
+                channel="phone"
                 href={`tel:${dealerPhone()}`}
                 className="flex min-h-12 items-center gap-3 rounded-md border border-white/15 px-4 text-sm font-bold text-white transition hover:border-white/35 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne"
               >
                 <Phone className="h-4 w-4 text-champagne" aria-hidden="true" />
                 {dealerPhoneDisplay()}
-              </a>
-              <a
+              </TrackedContactLink>
+              <TrackedContactLink
+                channel="whatsapp"
                 href={`https://wa.me/${dealerWhatsApp()}?text=${whatsAppMessage}`}
                 className="flex min-h-12 items-center justify-between gap-3 rounded-md bg-racing px-4 text-sm font-bold text-white transition hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne"
               >
@@ -87,7 +93,7 @@ export function Footer() {
                   Start on WhatsApp
                 </span>
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-              </a>
+              </TrackedContactLink>
               {showroomEmail ? (
                 <a
                   href={`mailto:${showroomEmail}`}

@@ -132,35 +132,6 @@ export function buildFallbackReply(message: string, cars: AssistantCar[]) {
   }
 
   const namedCars = findNamedCars(lowerMessage, cars);
-
-  if (/\b(available|availability|in stock|reserved|sold)\b/.test(lowerMessage)) {
-    if (namedCars.length > 0) {
-      return namedCars
-        .slice(0, 3)
-        .map(
-          (car) =>
-            `${car.year} ${car.brand} ${car.model} is ${titleCaseEnum(car.status).toLowerCase()}. ${siteUrl()}/cars/${car.slug}`
-        )
-        .join("\n");
-    }
-
-    if (availableCars.length === 0) {
-      return `No vehicle is marked available right now. ${dealerContactSentence()}`;
-    }
-
-    return `${availableCars.length} vehicle${availableCars.length === 1 ? " is" : "s are"} marked available now:\n${formatCarList(
-      availableCars.slice(0, 3)
-    )}`;
-  }
-
-  if (availableCars.length === 0) {
-    const reservedCars = cars.filter((car) => car.status === "RESERVED").slice(0, 3);
-    const reservedDetail =
-      reservedCars.length > 0 ? ` Current reserved vehicles:\n${formatCarList(reservedCars)}` : "";
-
-    return `No vehicle is marked available right now.${reservedDetail}\n${dealerContactSentence()}`;
-  }
-
   const budget = extractBudget(message);
   const requestedFuel = ["petrol", "diesel", "hybrid", "electric"].find((fuel) =>
     lowerMessage.includes(fuel)
@@ -193,6 +164,54 @@ export function buildFallbackReply(message: string, cars: AssistantCar[]) {
   const wantsLowMileage = /\b(?:lowest mileage|low mileage|least mileage)\b/.test(lowerMessage);
   const seatMatch = lowerMessage.match(/\b([2-9])[\s-]*(?:seat|seater|seats)\b/);
   const requestedSeats = seatMatch?.[1] ? Number(seatMatch[1]) : null;
+  const hasRecommendationCriteria = Boolean(
+    budget ||
+      requestedFuel ||
+      requestedTransmission ||
+      wantsSuv ||
+      wantsSedan ||
+      wantsFamily ||
+      wantsDailyDriver ||
+      wantsEconomy ||
+      wantsLuxury ||
+      wantsPerformance ||
+      wantsSafety ||
+      wantsCheapest ||
+      wantsNewest ||
+      wantsLowMileage ||
+      requestedSeats
+  );
+
+  if (
+    /\b(available|availability|in stock|reserved|sold)\b/.test(lowerMessage) &&
+    !hasRecommendationCriteria
+  ) {
+    if (namedCars.length > 0) {
+      return namedCars
+        .slice(0, 3)
+        .map(
+          (car) =>
+            `${car.year} ${car.brand} ${car.model} is ${titleCaseEnum(car.status).toLowerCase()}. ${siteUrl()}/cars/${car.slug}`
+        )
+        .join("\n");
+    }
+
+    if (availableCars.length === 0) {
+      return `No vehicle is marked available right now. ${dealerContactSentence()}`;
+    }
+
+    return `${availableCars.length} vehicle${availableCars.length === 1 ? " is" : "s are"} marked available now:\n${formatCarList(
+      availableCars.slice(0, 3)
+    )}`;
+  }
+
+  if (availableCars.length === 0) {
+    const reservedCars = cars.filter((car) => car.status === "RESERVED").slice(0, 3);
+    const reservedDetail =
+      reservedCars.length > 0 ? ` Current reserved vehicles:\n${formatCarList(reservedCars)}` : "";
+
+    return `No vehicle is marked available right now.${reservedDetail}\n${dealerContactSentence()}`;
+  }
 
   let matches = availableCars;
   const constraints: string[] = [];

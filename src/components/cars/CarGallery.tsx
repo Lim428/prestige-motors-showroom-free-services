@@ -4,13 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import type { SerializedCarImage } from "@/lib/cars";
+import { trackEngagement } from "@/lib/clientAnalytics";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
 export function CarGallery({
+  carId,
   images,
   title
 }: {
+  carId: string;
   images: SerializedCarImage[];
   title: string;
 }) {
@@ -30,10 +33,18 @@ export function CarGallery({
 
   function showPrevious() {
     setActiveIndex((current) => (current - 1 + images.length) % images.length);
+    trackEngagement("GALLERY_INTERACTION", {
+      carId,
+      metadata: { action: "previous" }
+    });
   }
 
   function showNext() {
     setActiveIndex((current) => (current + 1) % images.length);
+    trackEngagement("GALLERY_INTERACTION", {
+      carId,
+      metadata: { action: "next" }
+    });
   }
 
   return (
@@ -111,7 +122,13 @@ export function CarGallery({
                 thumbnailRefs.current[index] = node;
               }}
               type="button"
-              onClick={() => setActiveIndex(index)}
+              onClick={() => {
+                setActiveIndex(index);
+                trackEngagement("GALLERY_INTERACTION", {
+                  carId,
+                  metadata: { action: "thumbnail", imageIndex: index }
+                });
+              }}
               aria-label={`Show ${title} image ${index + 1}`}
               aria-pressed={safeActiveIndex === index}
               className={cn(

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { CalendarDays } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 
 export async function Header() {
@@ -16,7 +17,7 @@ export async function Header() {
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-sm font-black text-white transition group-hover:bg-graphite">
             PM
           </span>
-            <span className="min-w-0">
+            <span className="hidden min-w-0 sm:block">
               <span className="block truncate text-xs font-black uppercase tracking-[0.18em] text-ink sm:text-sm sm:tracking-[0.22em]">
               Prestige Motors
             </span>
@@ -34,16 +35,24 @@ export async function Header() {
               Inventory
             </Link>
             <Link
-              href="/#experience"
+              href="/compare"
               className="hidden min-h-11 items-center rounded-md px-3 text-sm font-bold text-ink/70 transition hover:bg-white hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing lg:inline-flex"
             >
-              Why Prestige
+              Compare
             </Link>
             <Link
               href="/#contact"
               className="hidden min-h-11 items-center rounded-md px-3 text-sm font-bold text-ink/70 transition hover:bg-white hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing md:inline-flex"
             >
               Contact
+            </Link>
+            <Link
+              href="/book-test-drive"
+              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-racing px-3 text-xs font-bold text-white transition hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2 focus-visible:ring-offset-smoke sm:px-4 sm:text-sm"
+            >
+              <CalendarDays className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Book test drive</span>
+              <span className="sm:hidden">Book</span>
             </Link>
             {session?.user ? (
               <Link

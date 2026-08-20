@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import {
   CarFront,
+  ChartNoAxesCombined,
   CircleCheckBig,
   Clock3,
   ExternalLink,
@@ -25,12 +26,15 @@ import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CarForm } from "@/components/admin/CarForm";
 import { EnquiryManager } from "@/components/admin/EnquiryManager";
+import { AdminGrowthHub } from "@/components/admin/growth/AdminGrowthHub";
+import type { GrowthSection } from "@/components/admin/growth/AdminGrowthHub";
 import { adminFetch } from "@/components/admin/adminFetch";
 import { titleCaseEnum } from "@/lib/format";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
-type Tab = "inventory" | "enquiries";
+export type AdminTab = "inventory" | "enquiries" | "growth";
+type Tab = AdminTab;
 type InventoryStatusFilter = "ALL" | CarStatus;
 type EnquiryStatusFilter = "ALL" | EnquiryStatus;
 
@@ -53,15 +57,21 @@ function formatAdminMileage(value: number) {
 export function AdminDashboard({
   initialCars,
   initialEnquiries,
+  initialTab = "inventory",
+  initialGrowthSection = "leads",
+  adminId,
   adminName
 }: {
   initialCars: SerializedCar[];
   initialEnquiries: AdminEnquiry[];
+  initialTab?: AdminTab;
+  initialGrowthSection?: GrowthSection;
+  adminId: string;
   adminName: string;
 }) {
   const [cars, setCars] = useState(initialCars);
   const [enquiries, setEnquiries] = useState(initialEnquiries);
-  const [tab, setTab] = useState<Tab>("inventory");
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [inventoryQuery, setInventoryQuery] = useState("");
   const [inventoryStatus, setInventoryStatus] =
     useState<InventoryStatusFilter>("ALL");
@@ -74,6 +84,10 @@ export function AdminDashboard({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [liveMessage, setLiveMessage] = useState("");
   const [isSigningOut, setIsSigningOut] = useState(false);
+
+  useEffect(() => {
+    setTab(initialTab);
+  }, [initialTab]);
 
   const available = cars.filter((car) => car.status === "AVAILABLE").length;
   const reserved = cars.filter((car) => car.status === "RESERVED").length;
@@ -309,7 +323,7 @@ export function AdminDashboard({
             Dealership overview
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/70">
-            Keep inventory accurate and follow every new customer enquiry.
+            Keep inventory accurate, follow every buyer, and act on live sales signals.
           </p>
         </div>
         <Button
@@ -361,7 +375,7 @@ export function AdminDashboard({
           <div
             role="tablist"
             aria-label="Admin workspace"
-            className="grid grid-cols-2 rounded-md bg-smoke p-1"
+            className="grid grid-cols-3 rounded-md bg-smoke p-1"
           >
             <button
               id="inventory-tab"
@@ -400,6 +414,25 @@ export function AdminDashboard({
                   {newEnquiries} new
                 </span>
               ) : null}
+            </button>
+            <button
+              id="growth-tab"
+              type="button"
+              role="tab"
+              aria-selected={tab === "growth"}
+              aria-controls="growth-panel"
+              onClick={() => setTab("growth")}
+              className={cn(
+                "min-h-11 rounded px-3 text-sm font-bold outline-none transition focus:ring-2 focus:ring-ink/25 sm:px-4",
+                tab === "growth"
+                  ? "bg-ink text-white shadow-sm"
+                  : "text-ink/70 hover:bg-white hover:text-ink"
+              )}
+            >
+              <span className="inline-flex items-center gap-2">
+                <ChartNoAxesCombined className="h-4 w-4" aria-hidden="true" />
+                Growth
+              </span>
             </button>
           </div>
           <p className="px-1 text-xs font-semibold text-ink/60">
@@ -658,7 +691,7 @@ export function AdminDashboard({
               )}
             </div>
           </section>
-        ) : (
+        ) : tab === "enquiries" ? (
           <section
             id="enquiries-panel"
             role="tabpanel"
@@ -670,6 +703,19 @@ export function AdminDashboard({
               onChange={setEnquiries}
               statusFilter={enquiryStatus}
               onStatusFilterChange={setEnquiryStatus}
+            />
+          </section>
+        ) : (
+          <section
+            id="growth-panel"
+            role="tabpanel"
+            aria-labelledby="growth-tab"
+            className="p-3 sm:p-4"
+          >
+            <AdminGrowthHub
+              key={initialGrowthSection}
+              currentAdmin={{ id: adminId, name: adminName }}
+              defaultSection={initialGrowthSection}
             />
           </section>
         )}

@@ -1,10 +1,21 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, MessageCircle } from "lucide-react";
+import {
+  ArrowUpRight,
+  BellRing,
+  CalendarDays,
+  CheckCircle2,
+  GitCompareArrows,
+  MessageCircle,
+  RefreshCw
+} from "lucide-react";
 import { CarCard } from "@/components/cars/CarCard";
 import { EmptyInventory } from "@/components/cars/EmptyInventory";
 import { ShowroomFilters } from "@/components/cars/ShowroomFilters";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { TrackedContactLink } from "@/components/analytics/TrackedContactLink";
+import { StockAlertForm } from "@/components/growth/StockAlertForm";
 import { getCars, getFilterOptions } from "@/lib/cars";
 import { number } from "@/lib/format";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
@@ -86,6 +97,7 @@ export default async function Home({
 
   return (
     <main>
+      <AnalyticsTracker event="PAGE_VIEW" />
       <section
         aria-labelledby="showroom-heading"
         className="relative isolate overflow-hidden bg-ink text-white"
@@ -129,13 +141,14 @@ export default async function Home({
                 Explore available cars
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-              <a
+              <TrackedContactLink
+                channel="whatsapp"
                 href={`https://wa.me/${dealerWhatsApp()}?text=${whatsAppMessage}`}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/30 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur transition hover:border-white/60 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 Ask the showroom
-              </a>
+              </TrackedContactLink>
             </div>
 
             {heroCar ? (
@@ -229,6 +242,67 @@ export default async function Home({
             <EmptyInventory />
           </div>
         )}
+      </section>
+
+      <section id="buyer-tools" className="scroll-mt-24 border-t border-white/10 bg-ink text-white">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] lg:px-8 lg:py-20">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-champagne">
+              Buyer toolkit
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-[-0.03em] sm:text-4xl">
+              Make the next step on your terms.
+            </h2>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-white/60 sm:text-base">
+              Save and compare vehicles, plan a showroom visit, estimate finance on any listing,
+              or send your current car for appraisal.
+            </p>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {[
+                {
+                  href: "/compare",
+                  icon: GitCompareArrows,
+                  title: "Compare saved cars",
+                  copy: "See specifications side by side."
+                },
+                {
+                  href: "/book-test-drive",
+                  icon: CalendarDays,
+                  title: "Book a test drive",
+                  copy: "Choose a live showroom time."
+                },
+                {
+                  href: "/trade-in",
+                  icon: RefreshCw,
+                  title: "Request an appraisal",
+                  copy: "Share details and vehicle photos."
+                }
+              ].map(({ href, icon: Icon, title, copy }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="group rounded-xl border border-white/12 bg-white/5 p-4 transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne"
+                >
+                  <Icon className="h-5 w-5 text-champagne" aria-hidden="true" />
+                  <h3 className="mt-4 text-sm font-black">{title}</h3>
+                  <p className="mt-1 text-xs leading-5 text-white/50">{copy}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-champagne">
+                    Open tool
+                    <ArrowUpRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            <p className="mt-7 flex items-start gap-2 text-xs leading-5 text-white/45">
+              <BellRing className="mt-0.5 h-4 w-4 shrink-0 text-champagne" aria-hidden="true" />
+              Alerts are matched against live inventory and recorded price changes.
+            </p>
+          </div>
+
+          <StockAlertForm />
+        </div>
       </section>
 
       <script

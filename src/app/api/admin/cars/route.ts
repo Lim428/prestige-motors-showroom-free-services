@@ -45,6 +45,12 @@ export async function POST(request: Request) {
         features: payload.features,
         status: payload.status,
         slug,
+        priceHistory: {
+          create: {
+            price: new Prisma.Decimal(payload.price),
+            reason: "Initial listing price"
+          }
+        },
         images: {
           create: payload.images.map((image, index) => ({
             url: image.url,

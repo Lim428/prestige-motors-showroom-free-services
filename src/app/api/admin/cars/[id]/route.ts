@@ -18,7 +18,7 @@ export async function PATCH(
 
     const existing = await prisma.car.findUnique({
       where: { id },
-      select: { id: true }
+      select: { id: true, price: true }
     });
 
     if (!existing) {
@@ -41,6 +41,8 @@ export async function PATCH(
     }
 
     const payload = carInputSchema.parse(requestBody);
+    const nextPrice = new Prisma.Decimal(payload.price);
+    const priceChanged = !existing.price.equals(nextPrice);
     const slug = await createUniqueCarSlug({
       brand: payload.brand,
       model: payload.model,
@@ -58,12 +60,21 @@ export async function PATCH(
         transmission: payload.transmission,
         fuelType: payload.fuelType,
         engine: payload.engine,
-        price: new Prisma.Decimal(payload.price),
+        price: nextPrice,
         condition: payload.condition,
         description: payload.description,
         features: payload.features,
         status: payload.status,
         slug,
+        priceHistory: priceChanged
+          ? {
+              create: {
+                previousPrice: existing.price,
+                price: nextPrice,
+                reason: "Admin listing update"
+              }
+            }
+          : undefined,
         images: {
           deleteMany: {},
           create: payload.images.map((image, index) => ({

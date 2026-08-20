@@ -32,7 +32,11 @@ export async function POST(request: Request) {
       const reply = await askGemini(payload, cars);
 
       if (reply) {
-        return ok({ reply, mode: "ai" });
+        return ok({
+          reply,
+          mode: "ai",
+          carIds: referencedCarIds(reply, cars)
+        });
       }
     } catch (error) {
       reason = "provider_error";
@@ -42,14 +46,33 @@ export async function POST(request: Request) {
       );
     }
 
+    const reply = buildFallbackReply(payload.message, cars);
+
     return ok({
-      reply: buildFallbackReply(payload.message, cars),
+      reply,
       mode: "basic",
-      reason
+      reason,
+      carIds: referencedCarIds(reply, cars)
     });
   } catch (error) {
     return handleRouteError(error);
   }
+}
+
+function referencedCarIds(
+  reply: string,
+  cars: Array<{ id: string; slug: string; brand: string; model: string }>
+) {
+  const normalizedReply = reply.toLowerCase();
+
+  return cars
+    .filter(
+      (car) =>
+        normalizedReply.includes(`/cars/${car.slug.toLowerCase()}`) ||
+        normalizedReply.includes(`${car.brand} ${car.model}`.toLowerCase())
+    )
+    .map((car) => car.id)
+    .slice(0, 4);
 }
 
 function clientIp(request: Request) {

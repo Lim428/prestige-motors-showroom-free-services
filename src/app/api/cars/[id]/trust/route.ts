@@ -12,7 +12,7 @@ export async function GET(
   try {
     const { id } = await params;
     const car = await prisma.car.findFirst({
-      where: { OR: [{ id }, { slug: id }] },
+      where: { isPublished: true, OR: [{ id }, { slug: id }] },
       select: {
         id: true,
         slug: true,

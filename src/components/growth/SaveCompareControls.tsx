@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Check, GitCompareArrows, Heart, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { SerializedCar } from "@/lib/cars";
+import { vehicleName } from "@/lib/car-display";
 import { trackGrowthEvent } from "@/lib/growth-client";
 import {
   readShortlist,
@@ -19,6 +20,7 @@ export type SaveCompareControlsProps = {
   car: SerializedCar;
   className?: string;
   compact?: boolean;
+  iconOnly?: boolean;
   showCompareLink?: boolean;
 };
 
@@ -26,6 +28,7 @@ export function SaveCompareControls({
   car,
   className,
   compact = false,
+  iconOnly = false,
   showCompareLink = true
 }: SaveCompareControlsProps) {
   const [savedIds, setSavedIds] = useState<string[]>([]);
@@ -38,6 +41,7 @@ export function SaveCompareControls({
   }, []);
 
   const isSaved = savedIds.includes(car.id);
+  const carName = vehicleName(car);
 
   function toggleSaved() {
     setMessage("");
@@ -71,12 +75,12 @@ export function SaveCompareControls({
         type="button"
         onClick={toggleSaved}
         aria-pressed={isSaved}
-        aria-label={isSaved ? `Remove ${car.year} ${car.brand} ${car.model} from saved cars` : `Save ${car.year} ${car.brand} ${car.model} for comparison`}
+        aria-label={isSaved ? `Remove ${carName} from saved cars` : `Save ${carName} for comparison`}
         className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-xl border text-sm font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2",
-          compact ? "h-10 px-3" : "min-h-12 px-4",
+          "inline-flex items-center justify-center gap-2 border text-sm font-black uppercase tracking-[0.05em] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2",
+          iconOnly ? "h-10 w-10 px-0" : compact ? "h-10 px-3" : "min-h-12 px-4",
           isSaved
-            ? "border-racing bg-racing text-white hover:bg-racing/90"
+            ? "border-ink bg-ink text-white hover:border-racing hover:bg-racing"
             : "border-ink/15 bg-white text-ink hover:border-ink/35 hover:bg-smoke"
         )}
       >
@@ -85,8 +89,10 @@ export function SaveCompareControls({
         ) : (
           <Heart className="h-4 w-4" aria-hidden="true" />
         )}
-        {isSaved ? "Saved" : "Save car"}
-        {isSaved ? <X className="h-3.5 w-3.5 opacity-60" aria-hidden="true" /> : null}
+        {iconOnly ? null : isSaved ? "Saved" : "Save car"}
+        {isSaved && !iconOnly ? (
+          <X className="h-3.5 w-3.5 opacity-60" aria-hidden="true" />
+        ) : null}
       </button>
 
       {showCompareLink ? (
@@ -99,13 +105,13 @@ export function SaveCompareControls({
             })
           }
           className={cn(
-            "inline-flex items-center justify-center gap-2 rounded-xl border border-ink/15 bg-smoke text-sm font-black text-ink transition hover:border-ink/35 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2",
+            "inline-flex items-center justify-center gap-2 border border-ink/20 bg-smoke text-sm font-black uppercase tracking-[0.05em] text-ink transition hover:border-racing hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2",
             compact ? "h-10 px-3" : "min-h-12 px-4"
           )}
         >
-          <GitCompareArrows className="h-4 w-4 text-copper" aria-hidden="true" />
+          <GitCompareArrows className="h-4 w-4 text-racing" aria-hidden="true" />
           Compare
-          <span className="grid min-h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-[10px] text-white">
+          <span className="grid min-h-5 min-w-5 place-items-center bg-ink px-1 text-[10px] text-white">
             {savedIds.length}
           </span>
         </Link>

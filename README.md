@@ -1,14 +1,14 @@
 # Prestige Motors Showroom
 
-Production-ready used-car showroom and sales operations platform built with Next.js, TypeScript, Tailwind CSS, Prisma, Neon PostgreSQL, Cloudinary, Google Gemini, NextAuth, and optional Resend email delivery.
+Production-ready used-car showroom and sales operations platform built with Next.js, TypeScript, Tailwind CSS, Prisma, Neon PostgreSQL, Cloudinary, Google Gemini or Vercel AI Gateway, NextAuth, and Resend email delivery.
 
 The public site helps buyers discover, compare, finance, and enquire about vehicles. The protected admin workspace turns those interactions into organised leads, appointments, appraisals, alerts, and measurable follow-up.
 
 ## Customer Conversion Suite
 
-- Responsive showroom with search, filters, sorting, loading and empty states, SEO metadata, sitemap, structured vehicle data, and detailed photo galleries.
+- Responsive showroom with search, body-type and mileage filters, sorting, loading and empty states, SEO metadata, sitemap, structured vehicle data, and detailed photo galleries.
 - Browser-based saved shortlist and a side-by-side comparison workspace for up to four vehicles.
-- Finance calculator for indicative deposit, loan term, interest, monthly payment, and total repayment estimates.
+- Finance calculator with reducing-balance/EIR and clearly labelled legacy flat-rate illustrations.
 - Test-drive and showroom appointment booking with live availability and collision-safe slot validation.
 - Trade-in appraisal requests with vehicle details, condition notes, and supporting image uploads.
 - New-stock and price-drop alerts with confirmation, unsubscribe support, and customer contact preferences.
@@ -22,8 +22,9 @@ Finance results are estimates only and are not lending offers. Trust information
 ## Admin and CRM Workspace
 
 - NextAuth credentials login backed by Prisma administrators.
-- Inventory management for creating, editing, deleting, and changing vehicle availability, with price-history recording.
-- Drag-and-drop multi-image upload with previews, MIME and size validation, Sharp WebP optimisation, and Cloudinary delivery in production.
+- Malaysia-ready inventory management for stock ID, exact variant, manufacture and registration years, body type, colours, engine capacity, seating, assembly, showroom location, price history, and draft/published visibility.
+- Guided drag-and-drop upload for up to 21 original vehicle photos, with previews, cover selection, per-file progress and recovery, MIME and size validation, Sharp WebP optimisation, and Cloudinary delivery in production.
+- Listing-readiness checks and fact-only English/Bahasa description templates to reduce incomplete or misleading listings.
 - Enquiry management with status updates and deletion.
 - Lead pipeline with source, priority, status, assignment, notes, and next-follow-up scheduling.
 - Appointment workspace for test drives and showroom visits, including confirmation and status management.
@@ -43,7 +44,7 @@ Finance results are estimates only and are not lending offers. Trust information
 
 Set `CRON_SECRET` in Vercel so scheduled requests can authenticate with `/api/cron/engagement`. Do not expose this endpoint secret in browser code.
 
-Resend delivery is optional. When `RESEND_API_KEY` and a verified `ALERT_FROM_EMAIL` sender are configured, the application can send transactional emails for leads, enquiries, appointments, trade-ins, and stock alerts. Without Resend, submissions are still saved and surfaced to administrators for manual follow-up.
+Resend delivery can be omitted for local and Preview environments. Vercel Production deployments require `RESEND_API_KEY` and a verified `ALERT_FROM_EMAIL` sender so leads, enquiries, appointments, trade-ins, and stock alerts have a working transactional-email path. Without Resend outside Production, submissions are still saved and surfaced to administrators for manual follow-up.
 
 Email alerts are sent automatically when email delivery is configured. Selecting SMS or WhatsApp currently records the customer's preferred contact method and creates a manual-follow-up notification; the application does not send SMS or WhatsApp messages automatically until a compatible messaging provider is integrated.
 
@@ -52,8 +53,8 @@ Email alerts are sent automatically when email delivery is configured. Selecting
 - **Vercel:** hosts the Next.js application, API routes, server-side rendering, scheduled engagement job, and deployment pipeline.
 - **Neon PostgreSQL:** stores administrators, inventory, enquiries, leads, appointments, trade-ins, alerts, notifications, analytics, price history, and trust-pack data.
 - **Cloudinary:** provides durable production storage and delivery for vehicle and trade-in images. Local development can fall back to local file storage.
-- **Google Gemini:** powers contextual inventory answers in the buyer assistant when configured; a local recommendation fallback keeps the assistant usable without an API key.
-- **Resend:** optionally delivers transactional and alert email from a verified sender domain.
+- **Google Gemini or Vercel AI Gateway:** powers contextual inventory answers in the buyer assistant; a local recommendation fallback keeps local and Preview builds usable without an AI credential.
+- **Resend:** delivers transactional and alert email from a verified sender domain in Production.
 
 ## Tech Stack
 
@@ -117,15 +118,18 @@ Start from `.env.example`. Use separate secrets for local, preview, and producti
 | `NEXTAUTH_URL` | Exact deployed HTTPS origin. |
 | `NEXTAUTH_SECRET` | Strong random secret of at least 32 characters. |
 | `NEXT_PUBLIC_SITE_URL` | Public deployed origin used for links, metadata, reports, and emails. |
-| `ADMIN_EMAIL` | Administrator email created or updated by the seed step. |
-| `ADMIN_PASSWORD` | Strong administrator password used by the seed step. |
+| `ADMIN_EMAIL` | Administrator email created or updated by the explicit seed step. |
+| `ADMIN_PASSWORD` | Strong administrator password used by the explicit seed step. |
+| `SEED_DEMO_CARS` | Set to `true` only in a local or non-customer demo environment; the Production gate rejects it. |
 | `DEALER_NAME` | Dealership name shown across the site and messages. |
 | `DEALER_PHONE` | Customer-facing telephone number. |
 | `DEALER_WHATSAPP` | Customer-facing WhatsApp number, including country code. |
 | `DEALER_EMAIL` | Customer-facing and internal notification address. |
+| `DEALER_ADDRESS` | Complete customer-facing showroom address; required by the Production gate. |
+| `DEALER_HOURS` | Customer-facing opening hours; required by the Production gate. |
 | `CRON_SECRET` | Strong secret that protects the daily engagement endpoint. |
 
-`DEALER_ADDRESS` and `DEALER_HOURS` are optional display details.
+`SHOWROOM_PREVIEW` and `SEED_DEMO_CARS` must be unset or `false` in customer Production. The validator rejects either flag when enabled so preview inventory and sample vehicles cannot leak into the live showroom.
 
 ### Image storage
 
@@ -138,20 +142,25 @@ Start from `.env.example`. Use separate secrets for local, preview, and producti
 
 Configure all three Cloudinary credentials for production. Vercel's filesystem is ephemeral and must not be treated as permanent upload storage.
 
-### Optional AI and email services
+### AI and email services
 
 | Variable | Purpose |
 | --- | --- |
 | `GEMINI_API_KEY` | Server-side Google AI Studio key for the buyer assistant. |
 | `GEMINI_MODEL` | Gemini model identifier; the example file supplies a default. |
+| `AI_GATEWAY_API_KEY` | Optional explicit Vercel AI Gateway credential. Vercel Production can use its automatically injected `VERCEL_OIDC_TOKEN` instead. |
 | `RESEND_API_KEY` | Server-side Resend key for transactional email delivery. |
 | `ALERT_FROM_EMAIL` | Resend sender in `Name <email@verified-domain>` format. |
+
+Local and Preview builds may omit AI and Resend credentials. The Vercel Production build requires one valid Gemini or AI Gateway credential plus a complete Resend sender configuration.
 
 Never give secrets a `NEXT_PUBLIC_` prefix. `NEXT_PUBLIC_SITE_URL` is intentionally public; database, authentication, Cloudinary, Gemini, cron, and Resend credentials are not.
 
 ## Admin Access
 
 The seed script creates or updates one administrator from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. The values in `.env.example` are development placeholders only. Replace both before deploying, use a unique password, and rotate it immediately if it is ever exposed.
+
+New vehicle records should start as drafts. Gather the confirmed facts with [`docs/vehicle-inventory-intake.csv`](docs/vehicle-inventory-intake.csv) and follow the original-photo and privacy checklist in [`docs/malaysia-vehicle-listing-handoff.md`](docs/malaysia-vehicle-listing-handoff.md) before publishing.
 
 Customers see the showroom first; the admin login remains deliberately unobtrusive.
 
@@ -161,9 +170,13 @@ Customers see the showroom first; the admin login remains deliberately unobtrusi
 2. Create a Cloudinary account and add its three server-side credentials. Production uploads should not rely on local fallback storage.
 3. Import the GitHub repository into Vercel and add the production environment variables listed above.
 4. Set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to the final Vercel or custom-domain HTTPS origin.
-5. Set a strong `CRON_SECRET`. Vercel uses it as the bearer token for the scheduled engagement request.
-6. Optionally configure Gemini and Resend. Verify the sender domain before setting `ALERT_FROM_EMAIL`.
-7. Deploy and smoke-test the public enquiry, assistant, booking, trade-in, alert, and administrator flows.
+5. Add the confirmed `DEALER_NAME`, phone, WhatsApp, email, complete address, and opening hours. Do not publish invented location or schedule details.
+6. Keep `SHOWROOM_PREVIEW` and `SEED_DEMO_CARS` unset or `false` in customer Production.
+7. Set a strong `CRON_SECRET`. Vercel uses it as the bearer token for the scheduled engagement request.
+8. Configure either Gemini or Vercel AI Gateway. Vercel normally injects `VERCEL_OIDC_TOKEN` for Gateway authentication; an explicit `AI_GATEWAY_API_KEY` is also supported.
+9. Configure Resend and verify the sender domain before setting `ALERT_FROM_EMAIL`.
+10. Before promoting a release, run `npm run db:deploy` once against the intended Neon database. For a new database, run `npm run db:seed` once with `SEED_DEMO_CARS=false` to provision the administrator.
+11. Deploy and smoke-test the public enquiry, assistant, booking, trade-in, alert, and administrator flows.
 
 The configured Vercel build command is:
 
@@ -171,7 +184,9 @@ The configured Vercel build command is:
 npm run vercel-build
 ```
 
-It runs `prisma generate`, `prisma migrate deploy`, the idempotent seed/admin setup, and `next build`. Commit and review migration files before deployment, back up important production data before schema changes, and use `prisma migrate deploy` rather than `prisma migrate dev` in production. Do not run competing production deployments that may attempt schema changes at the same time.
+It first runs `npm run validate:production-env`. The validator skips local, Preview, and CI builds, but fails a Vercel Production build when required credentials are missing, malformed, too short, or still use localhost/example/default placeholders. It reports only variable names and corrective guidance; it never prints secret values. A passing build then runs Prisma client generation and `next build` without mutating the production database.
+
+Migrations and administrator provisioning are deliberate release operations: commit and review migration files, back up important production data, then run `npm run db:deploy` once before promotion. Never run `prisma migrate dev` against production.
 
 After changing any production environment variable, redeploy so the application uses the new value. Check the Vercel build, function, and cron logs after the first deployment and after database migrations.
 
@@ -206,6 +221,8 @@ Keep the key server-side. Do not paste it into frontend code, GitHub, screenshot
 - Verify the Resend sender domain and monitor delivery before relying on automated email.
 - Treat SMS and WhatsApp subscriptions as manual follow-up until a messaging provider is connected.
 - Review trust-pack content before marking a vehicle verified and publishing its PDF report.
+- Keep `SHOWROOM_PREVIEW` disabled in Production so only database-backed inventory appears.
+- Keep `SEED_DEMO_CARS` disabled in production unless a non-customer demo environment explicitly needs sample stock.
 - Back up production data and review each committed Prisma migration before deploying it.
 
 ## Useful Commands
@@ -216,6 +233,9 @@ npm run build
 npm run start
 npm run lint
 npm run typecheck
+npm run i18n:smoke
+npm run assistant:smoke
+npm run validate:production-env
 npm run prisma:generate
 npm run db:migrate
 npm run db:deploy

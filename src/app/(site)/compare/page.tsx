@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { ComparePageClient } from "@/components/growth/ComparePageClient";
+import { siteUrl } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Compare Vehicles",
-  description: "Compare saved Prestige Motors vehicles side by side by price, mileage, specifications, and equipment."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.compare");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: `${siteUrl()}/compare` }
+  };
+}
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

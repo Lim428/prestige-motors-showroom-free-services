@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, CheckCircle2, Clock3, MapPin, ShieldCheck } from "lucide-react";
 import { AppointmentForm } from "@/components/growth/AppointmentForm";
+import { vehicleName } from "@/lib/car-display";
 import { getCars } from "@/lib/cars";
-import { dealerAddress, dealerHours } from "@/lib/utils";
+import { dealerAddress, dealerHours, siteUrl } from "@/lib/utils";
 import { carQuerySchema } from "@/lib/validators";
 
-export const metadata: Metadata = {
-  title: "Book a Test Drive",
-  description: "Request a private Prestige Motors test drive using live showroom appointment times."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.testDrive");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: `${siteUrl()}/book-test-drive` }
+  };
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -35,7 +41,7 @@ export default async function BookTestDrivePage({
   );
   const vehicles = bookableCars.map((car) => ({
     id: car.id,
-    name: `${car.year} ${car.brand} ${car.model} — ${car.formattedPrice}`,
+    name: `${vehicleName(car)} — ${car.formattedPrice}`,
     status: car.status
   }));
   const address = dealerAddress();
@@ -43,25 +49,25 @@ export default async function BookTestDrivePage({
 
   return (
     <main>
-      <section className="bg-ink text-white">
+      <section className="border-b-8 border-racing bg-ink text-white">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <Link
             href={selectedCar ? `/cars/${selectedCar.slug}` : "/#inventory"}
-            className="inline-flex items-center gap-2 text-sm font-black text-white/60 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             {selectedCar ? "Back to vehicle" : "Back to inventory"}
           </Link>
           <div className="mt-8 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-champagne">
+            <p className="border-l-8 border-racing pl-3 text-xs font-black uppercase tracking-[0.24em] text-white/70">
               Your private showroom visit
             </p>
-            <h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-6xl">
+            <h1 className="mt-5 max-w-4xl font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.025em] sm:text-7xl">
               Drive it. Feel it. Decide clearly.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/65 sm:text-lg">
               {selectedCar
-                ? `Request a dedicated appointment for the ${selectedCar.year} ${selectedCar.brand} ${selectedCar.model}.`
+                ? `Request a dedicated appointment for the ${vehicleName(selectedCar)}.`
                 : "Select a vehicle and a live showroom time. Our team will prepare everything before you arrive."}
             </p>
           </div>
@@ -76,11 +82,11 @@ export default async function BookTestDrivePage({
         />
 
         <aside className="space-y-5">
-          <section className="rounded-[1.5rem] border border-ink/10 bg-white p-5 shadow-panel sm:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-copper">
+          <section className="border border-ink/15 bg-white p-5 sm:p-6">
+            <p className="border-l-[6px] border-racing pl-3 text-xs font-black uppercase tracking-[0.18em] text-racing">
               What to expect
             </p>
-            <h2 className="mt-2 text-xl font-black text-ink">A visit built around you</h2>
+            <h2 className="mt-3 font-display text-2xl font-black uppercase leading-none text-ink">A visit built around you</h2>
             <ul className="mt-5 space-y-4">
               {[
                 "The selected vehicle is prepared before your arrival.",
@@ -97,14 +103,14 @@ export default async function BookTestDrivePage({
           </section>
 
           {address || hours ? (
-            <section className="rounded-[1.5rem] bg-ink p-5 text-white shadow-panel sm:p-6">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-champagne">
+            <section className="border-l-8 border-racing bg-ink p-5 text-white sm:p-6">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-white/60">
                 Showroom details
               </p>
               <dl className="mt-5 space-y-4 text-sm">
                 {address ? (
                   <div className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-champagne" aria-hidden="true" />
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-racing" aria-hidden="true" />
                     <div>
                       <dt className="font-black">Location</dt>
                       <dd className="mt-1 leading-6 text-white/60">{address}</dd>
@@ -113,7 +119,7 @@ export default async function BookTestDrivePage({
                 ) : null}
                 {hours ? (
                   <div className="flex items-start gap-3">
-                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-champagne" aria-hidden="true" />
+                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-racing" aria-hidden="true" />
                     <div>
                       <dt className="font-black">Opening hours</dt>
                       <dd className="mt-1 leading-6 text-white/60">{hours}</dd>

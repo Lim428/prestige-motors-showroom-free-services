@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BadgeCheck,
@@ -74,7 +74,7 @@ const emptyProfile: TrustProfileDraft = {
 };
 
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15 disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15 disabled:cursor-not-allowed disabled:opacity-50";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -225,6 +225,7 @@ function malaysiaToday() {
 }
 
 export function TrustPackEditor() {
+  const trustRequestIdRef = useRef(0);
   const [cars, setCars] = useState<CarOption[]>([]);
   const [selectedCarId, setSelectedCarId] = useState("");
   const [profile, setProfile] = useState<TrustProfileDraft>({ ...emptyProfile });
@@ -300,9 +301,12 @@ export function TrustPackEditor() {
   }, [loadCars]);
 
   const loadTrustPack = useCallback(async (carId: string) => {
+    const requestId = ++trustRequestIdRef.current;
+
     if (!carId) {
       setProfile({ ...emptyProfile });
       setDocuments([]);
+      setIsLoadingTrust(false);
       return;
     }
     setIsLoadingTrust(true);
@@ -314,17 +318,23 @@ export function TrustPackEditor() {
         { method: "GET" },
         "Vehicle trust pack could not be loaded."
       );
+      if (requestId !== trustRequestIdRef.current) return;
+
       const normalized = normalizeTrust(payload);
       setProfile(normalized.profile);
       setDocuments(normalized.documents);
     } catch (loadError) {
+      if (requestId !== trustRequestIdRef.current) return;
+
       setError(
         loadError instanceof Error
           ? loadError.message
           : "Vehicle trust pack could not be loaded."
       );
     } finally {
-      setIsLoadingTrust(false);
+      if (requestId === trustRequestIdRef.current) {
+        setIsLoadingTrust(false);
+      }
     }
   }, []);
 
@@ -424,9 +434,10 @@ export function TrustPackEditor() {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h3 className="text-xl font-black text-ink">Vehicle trust packs</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Evidence desk</p>
+          <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Vehicle trust packs</h3>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/65">
             Publish inspection evidence, service history and warranty details that
             help buyers purchase with confidence.
@@ -435,7 +446,7 @@ export function TrustPackEditor() {
         {selectedCar?.slug ? (
           <Link
             href={`/cars/${selectedCar.slug}`}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+            className="inline-flex h-11 items-center justify-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
           >
             View listing
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
@@ -443,12 +454,12 @@ export function TrustPackEditor() {
         ) : null}
       </div>
 
-      <div className="mt-5 rounded-md border border-ink/10 bg-smoke/35 p-4">
+      <div className="mt-5 border border-ink/15 border-l-4 border-l-signal bg-smoke/35 p-4">
         <label className="grid gap-1.5 text-sm font-black text-ink">
           Select a vehicle
           <select
             value={selectedCarId}
-            disabled={isLoadingCars}
+            disabled={isLoadingCars || isSaving}
             onChange={(event) => chooseCar(event.target.value)}
             className={`${controlClassName} w-full sm:max-w-xl`}
           >
@@ -469,14 +480,14 @@ export function TrustPackEditor() {
 
       <div aria-live="polite" aria-atomic="true" className="mt-3">
         {error ? (
-          <div role="alert" className="flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div role="alert" className="flex flex-col gap-3 border border-red-200 border-l-4 border-l-red-600 bg-red-50 p-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-bold text-red-800">{error}</p>
             <button
               type="button"
               onClick={() =>
                 selectedCarId ? void loadTrustPack(selectedCarId) : void loadCars()
               }
-              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-3 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"
+              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 border border-red-300 bg-white px-3 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"
             >
               <RefreshCw className="h-4 w-4" aria-hidden="true" />
               Try again
@@ -484,28 +495,28 @@ export function TrustPackEditor() {
           </div>
         ) : null}
         {successMessage ? (
-          <p className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-800">
+          <p className="border border-emerald-200 border-l-4 border-l-emerald-600 bg-emerald-50 p-3 text-sm font-bold text-emerald-800">
             {successMessage}
           </p>
         ) : null}
       </div>
 
       {isLoadingTrust ? (
-        <div role="status" className="mt-4 grid min-h-72 place-items-center rounded-md border border-dashed border-ink/15 bg-smoke/30 text-center">
+        <div role="status" className="mt-4 grid min-h-72 place-items-center border border-dashed border-ink/20 bg-smoke/30 text-center">
           <div>
-            <Loader2 className="mx-auto h-7 w-7 animate-spin text-copper" aria-hidden="true" />
+            <Loader2 className="mx-auto h-7 w-7 animate-spin text-signal" aria-hidden="true" />
             <p className="mt-3 text-sm font-bold text-ink/60">Loading trust pack</p>
           </div>
         </div>
       ) : selectedCarId ? (
         <div className="mt-5 grid gap-5">
-          <section aria-labelledby="inspection-title" className="rounded-md border border-ink/10 p-4 sm:p-5">
+          <section aria-labelledby="inspection-title" className="border border-ink/15 p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-md bg-racing text-white">
+              <span className="grid h-10 w-10 place-items-center bg-signal text-white">
                 <ShieldCheck className="h-5 w-5" aria-hidden="true" />
               </span>
               <div>
-                <h4 id="inspection-title" className="font-black text-ink">Inspection and ownership</h4>
+                <h4 id="inspection-title" className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">Inspection and ownership</h4>
                 <p className="text-xs text-ink/55">Core proof displayed on the public vehicle page</p>
               </div>
             </div>
@@ -543,16 +554,16 @@ export function TrustPackEditor() {
               </label>
               <label className="grid gap-1.5 text-sm font-bold text-ink sm:col-span-2 xl:col-span-3">
                 Inspection summary
-                <textarea value={profile.inspectionSummary} onChange={(event) => setProfile((current) => ({ ...current, inspectionSummary: event.target.value }))} rows={3} placeholder="Key inspection findings and condition highlights" className="rounded-md border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15" />
+                <textarea value={profile.inspectionSummary} onChange={(event) => setProfile((current) => ({ ...current, inspectionSummary: event.target.value }))} rows={3} placeholder="Key inspection findings and condition highlights" className="border border-ink/20 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15" />
               </label>
             </div>
             <div
               id="trust-verification-requirements"
               aria-live="polite"
-              className={`mt-4 rounded-md border p-3 ${
+              className={`mt-4 border border-l-4 p-3 ${
                 verificationReady
-                  ? "border-emerald-200 bg-emerald-50"
-                  : "border-amber-200 bg-amber-50"
+                  ? "border-emerald-200 border-l-emerald-600 bg-emerald-50"
+                  : "border-amber-200 border-l-amber-500 bg-amber-50"
               }`}
             >
               <p className={`text-sm font-black ${verificationReady ? "text-emerald-900" : "text-amber-950"}`}>
@@ -577,30 +588,30 @@ export function TrustPackEditor() {
             </div>
           </section>
 
-          <section aria-labelledby="history-title" className="rounded-md border border-ink/10 p-4 sm:p-5">
+          <section aria-labelledby="history-title" className="border border-ink/15 p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-md bg-copper text-white"><BadgeCheck className="h-5 w-5" aria-hidden="true" /></span>
-              <div><h4 id="history-title" className="font-black text-ink">Service history and warranty</h4><p className="text-xs text-ink/55">Coverage and maintenance confidence</p></div>
+              <span className="grid h-10 w-10 place-items-center bg-signal text-white"><BadgeCheck className="h-5 w-5" aria-hidden="true" /></span>
+              <div><h4 id="history-title" className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">Service history and warranty</h4><p className="mt-1 text-xs text-ink/55">Coverage and maintenance confidence</p></div>
             </div>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label className="grid gap-1.5 text-sm font-bold text-ink">Warranty provider<input value={profile.warrantyProvider} onChange={(event) => setProfile((current) => ({ ...current, warrantyProvider: event.target.value }))} className={controlClassName} /></label>
               <label className="grid gap-1.5 text-sm font-bold text-ink">Warranty duration (months)<input type="number" min="0" value={profile.warrantyMonths} onChange={(event) => setProfile((current) => ({ ...current, warrantyMonths: event.target.value }))} className={controlClassName} /></label>
-              <label className="grid gap-1.5 text-sm font-bold text-ink sm:col-span-2">Service history summary<textarea value={profile.serviceHistorySummary} onChange={(event) => setProfile((current) => ({ ...current, serviceHistorySummary: event.target.value }))} rows={3} placeholder="Service intervals, workshops and notable maintenance" className="rounded-md border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15" /></label>
+              <label className="grid gap-1.5 text-sm font-bold text-ink sm:col-span-2">Service history summary<textarea value={profile.serviceHistorySummary} onChange={(event) => setProfile((current) => ({ ...current, serviceHistorySummary: event.target.value }))} rows={3} placeholder="Service intervals, workshops and notable maintenance" className="border border-ink/20 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15" /></label>
             </div>
           </section>
 
-          <section aria-labelledby="documents-title" className="rounded-md border border-ink/10 p-4 sm:p-5">
+          <section aria-labelledby="documents-title" className="border border-ink/15 p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-md bg-ink text-white"><FileCheck2 className="h-5 w-5" aria-hidden="true" /></span>
-                <div><h4 id="documents-title" className="font-black text-ink">Verified documents</h4><p className="text-xs text-ink/55">Only checked items are shown as verified</p></div>
+                <span className="grid h-10 w-10 place-items-center bg-ink text-white"><FileCheck2 className="h-5 w-5" aria-hidden="true" /></span>
+                <div><h4 id="documents-title" className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">Verified documents</h4><p className="mt-1 text-xs text-ink/55">Only checked items are shown as verified</p></div>
               </div>
-              <button type="button" onClick={() => setDocuments((current) => [...current, newDocument()])} className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"><FilePlus2 className="h-4 w-4" aria-hidden="true" />Add document</button>
+              <button type="button" onClick={() => setDocuments((current) => [...current, newDocument()])} className="inline-flex h-11 items-center justify-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"><FilePlus2 className="h-4 w-4" aria-hidden="true" />Add document</button>
             </div>
 
             <div className="mt-4 grid gap-3">
               {documents.length > 0 ? documents.map((document, index) => (
-                <fieldset key={document.localId} className="rounded-md border border-ink/10 bg-smoke/25 p-3">
+                <fieldset key={document.localId} className="border border-ink/15 bg-smoke/25 p-3">
                   <legend className="px-1 text-xs font-black uppercase tracking-wide text-ink/50">Document {index + 1}</legend>
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <label className="grid gap-1.5 text-sm font-bold text-ink">Category<select value={document.category} onChange={(event) => updateDocument(document.localId, { category: event.target.value })} className={controlClassName}>{categoryOptions.map((category) => <option key={category} value={category}>{titleCase(category)}</option>)}</select></label>
@@ -609,17 +620,17 @@ export function TrustPackEditor() {
                     <label className="grid gap-1.5 text-sm font-bold text-ink">Issued date<input type="date" value={document.issuedAt} onChange={(event) => updateDocument(document.localId, { issuedAt: event.target.value })} className={controlClassName} /></label>
                     <label className="grid gap-1.5 text-sm font-bold text-ink">Expiry date<input type="date" value={document.expiresAt} onChange={(event) => updateDocument(document.localId, { expiresAt: event.target.value })} className={controlClassName} /></label>
                     <label className="inline-flex min-h-11 items-center gap-2 self-end text-sm font-bold text-ink/70"><input type="checkbox" checked={document.verified} onChange={(event) => updateDocument(document.localId, { verified: event.target.checked })} className="h-4 w-4 rounded border-ink/20 text-ink focus:ring-ink/20" />Verified by dealership</label>
-                    <button type="button" onClick={() => setDocuments((current) => current.filter((item) => item.localId !== document.localId))} className="inline-flex h-11 items-center justify-center gap-2 self-end rounded-md text-sm font-bold text-red-700 outline-none hover:bg-red-50 focus:ring-2 focus:ring-red-300"><Trash2 className="h-4 w-4" aria-hidden="true" />Remove</button>
+                    <button type="button" onClick={() => setDocuments((current) => current.filter((item) => item.localId !== document.localId))} className="inline-flex h-11 items-center justify-center gap-2 self-end border border-transparent text-sm font-bold text-red-700 outline-none hover:border-red-200 hover:bg-red-50 focus:ring-2 focus:ring-red-300"><Trash2 className="h-4 w-4" aria-hidden="true" />Remove</button>
                   </div>
                 </fieldset>
               )) : (
-                <div className="grid min-h-36 place-items-center rounded-md border border-dashed border-ink/20 bg-smoke/25 px-5 text-center"><div><FilePlus2 className="mx-auto h-7 w-7 text-ink/30" aria-hidden="true" /><p className="mt-2 text-sm font-bold text-ink/65">No supporting documents yet</p></div></div>
+                <div className="grid min-h-36 place-items-center border border-dashed border-ink/25 bg-smoke/25 px-5 text-center"><div><FilePlus2 className="mx-auto h-7 w-7 text-ink/30" aria-hidden="true" /><p className="mt-2 text-sm font-bold text-ink/65">No supporting documents yet</p></div></div>
               )}
             </div>
           </section>
 
-          <div className="sticky bottom-3 z-10 flex justify-end rounded-md border border-ink/10 bg-white/95 p-3 shadow-panel backdrop-blur">
-            <button type="button" onClick={() => void saveTrustPack()} disabled={isSaving || (profile.inspectionStatus === "VERIFIED" && !verificationReady)} aria-describedby="trust-verification-requirements" className="inline-flex h-12 items-center gap-2 rounded-md bg-ink px-5 text-sm font-black text-white outline-none hover:bg-graphite focus:ring-2 focus:ring-ink/30 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+          <div className="sticky bottom-3 z-10 flex justify-end border border-ink/20 border-l-4 border-l-signal bg-white/95 p-3 shadow-[0_12px_30px_rgba(9,9,9,0.10)] backdrop-blur">
+            <button type="button" onClick={() => void saveTrustPack()} disabled={isSaving || (profile.inspectionStatus === "VERIFIED" && !verificationReady)} aria-describedby="trust-verification-requirements" className="inline-flex h-12 items-center gap-2 bg-ink px-5 text-sm font-black uppercase tracking-wide text-white outline-none hover:bg-signal focus:ring-2 focus:ring-signal/30 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
               {isSaving
                 ? "Saving trust pack..."
@@ -630,8 +641,8 @@ export function TrustPackEditor() {
           </div>
         </div>
       ) : (
-        <div className="mt-5 grid min-h-64 place-items-center rounded-md border border-dashed border-ink/20 bg-smoke/25 px-5 text-center">
-          <div><CarFront className="mx-auto h-8 w-8 text-ink/30" aria-hidden="true" /><h4 className="mt-3 font-black text-ink">Choose a vehicle</h4><p className="mt-1 text-sm text-ink/60">Select inventory above to review or create its trust pack.</p></div>
+        <div className="mt-5 grid min-h-64 place-items-center border border-dashed border-ink/25 bg-smoke/25 px-5 text-center">
+          <div><CarFront className="mx-auto h-8 w-8 text-ink/30" aria-hidden="true" /><h4 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-ink">Choose a vehicle</h4><p className="mt-1 text-sm text-ink/60">Select inventory above to review or create its trust pack.</p></div>
         </div>
       )}
     </div>

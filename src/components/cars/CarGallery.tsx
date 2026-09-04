@@ -48,8 +48,8 @@ export function CarGallery({
   }
 
   return (
-    <figure aria-label={`${title} photo gallery`} className="space-y-3">
-      <div className="group relative aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-zinc-200 shadow-panel sm:aspect-[16/10]">
+    <figure aria-label={`${title} photo gallery`} className="space-y-4">
+      <div className="group relative aspect-[4/3] overflow-hidden border border-ink/15 bg-zinc-200 sm:aspect-[16/10]">
         {activeImage ? (
           <Image
             src={runtimeImageUrl(activeImage.url)}
@@ -74,7 +74,7 @@ export function CarGallery({
             <button
               type="button"
               onClick={showPrevious}
-              className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/35 bg-ink/55 text-white shadow-lg backdrop-blur transition hover:bg-ink/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:left-4"
+              className="absolute left-0 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center border-y border-r border-white/30 bg-ink/85 text-white transition hover:bg-racing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset sm:left-4 sm:border"
               aria-label={`Show previous ${title} photo`}
             >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -82,7 +82,7 @@ export function CarGallery({
             <button
               type="button"
               onClick={showNext}
-              className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/35 bg-ink/55 text-white shadow-lg backdrop-blur transition hover:bg-ink/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:right-4"
+              className="absolute right-0 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center border-y border-l border-white/30 bg-ink/85 text-white transition hover:bg-racing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset sm:right-4 sm:border"
               aria-label={`Show next ${title} photo`}
             >
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -92,7 +92,7 @@ export function CarGallery({
 
         {images.length > 0 ? (
           <div
-            className="absolute bottom-3 right-3 rounded-full border border-white/25 bg-ink/65 px-3 py-1.5 text-xs font-bold tabular-nums text-white backdrop-blur sm:bottom-4 sm:right-4"
+            className="absolute bottom-0 right-0 border-l border-t border-white/25 bg-ink px-3 py-2 text-xs font-black tabular-nums tracking-[0.12em] text-white sm:bottom-4 sm:right-4 sm:border"
             aria-live="polite"
             aria-atomic="true"
           >
@@ -102,7 +102,7 @@ export function CarGallery({
       </div>
 
       {activeImage ? (
-        <figcaption className="flex items-start justify-between gap-4 px-1 text-xs text-ink/50">
+        <figcaption className="flex items-start justify-between gap-4 border-b border-ink/15 pb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-ink/50">
           <span className="line-clamp-1">{activeImage.altText}</span>
           <span className="shrink-0 font-semibold text-ink/65">
             Dealer photography
@@ -132,9 +132,9 @@ export function CarGallery({
               aria-label={`Show ${title} image ${index + 1}`}
               aria-pressed={safeActiveIndex === index}
               className={cn(
-                "relative aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-xl border-2 bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/50 focus-visible:ring-offset-2 sm:w-28",
+                "relative aspect-[4/3] w-24 shrink-0 overflow-hidden border-2 bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2 sm:w-28",
                 safeActiveIndex === index
-                  ? "border-copper shadow-panel"
+                  ? "border-racing"
                   : "border-transparent opacity-60 hover:opacity-100"
               )}
             >

@@ -21,7 +21,7 @@ export type LeadCaptureCardProps = {
 type SubmissionState = "idle" | "success" | "error";
 
 const fieldClass =
-  "mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-racing/20";
+  "mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20";
 
 export function LeadCaptureCard({
   transcript = [],
@@ -94,21 +94,21 @@ export function LeadCaptureCard({
     <section
       aria-labelledby={`${id}-title`}
       className={cn(
-        "overflow-hidden rounded-[1.5rem] border border-ink/10 bg-white shadow-panel",
+        "overflow-hidden border border-ink/15 bg-white",
         className
       )}
     >
-      <div className="border-b border-ink/10 bg-[linear-gradient(135deg,#171714_0%,#272621_100%)] p-5 text-white sm:p-6">
+      <div className="border-b-8 border-racing bg-ink p-5 text-white sm:p-6">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-champagne text-ink">
+          <span className="grid h-10 w-10 shrink-0 place-items-center border border-white/25 bg-racing text-white">
             <MessageSquareText className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.18em] text-champagne">
+            <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.18em] text-white/60">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
               Continue with a person
             </p>
-            <h2 id={`${id}-title`} className="mt-2 text-xl font-black tracking-tight">
+            <h2 id={`${id}-title`} className="mt-3 font-display text-2xl font-black uppercase leading-none tracking-[-0.02em]">
               Send this chat to the showroom
             </h2>
             <p className="mt-2 text-sm leading-6 text-white/60">
@@ -165,12 +165,12 @@ export function LeadCaptureCard({
           </label>
         </div>
 
-        <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl bg-smoke p-4">
+        <label className="mt-5 flex cursor-pointer items-start gap-3 border-l-4 border-ink bg-smoke p-4">
           <input
             type="checkbox"
             name="consent"
             required
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-ink/20"
+            className="mt-0.5 h-4 w-4 shrink-0 border-ink/20 accent-racing"
           />
           <span className="text-xs leading-5 text-ink/60">
             I agree that Prestige Motors may contact me about this request. My chat and selected
@@ -183,8 +183,8 @@ export function LeadCaptureCard({
             role={state === "error" ? "alert" : "status"}
             aria-live={state === "error" ? "assertive" : "polite"}
             className={cn(
-              "mt-4 rounded-xl px-4 py-3 text-sm font-semibold leading-6",
-              state === "success" ? "bg-racing/10 text-racing" : "bg-red-50 text-red-700"
+              "mt-4 border-l-4 px-4 py-3 text-sm font-semibold leading-6",
+              state === "success" ? "border-emerald-600 bg-emerald-50 text-emerald-800" : "border-red-700 bg-red-50 text-red-700"
             )}
           >
             <span className="flex items-start gap-2">
@@ -199,7 +199,12 @@ export function LeadCaptureCard({
         <button
           type="submit"
           disabled={isPending || state === "success"}
-          className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-racing px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+          className={cn(
+            "mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 px-5 text-sm font-black uppercase tracking-[0.08em] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70",
+            state === "success"
+              ? "bg-emerald-700 focus-visible:ring-emerald-500/30"
+              : "bg-racing hover:bg-copper focus-visible:ring-racing/30"
+          )}
         >
           {state === "success" ? (
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />

@@ -6,12 +6,12 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const variantClass: Record<Variant, string> = {
   primary:
-    "border border-ink bg-ink text-white shadow-soft hover:-translate-y-0.5 hover:border-graphite hover:bg-graphite",
+    "border border-ink bg-ink text-white hover:border-copper hover:bg-copper",
   secondary:
-    "border border-ink/20 bg-white text-ink shadow-sm hover:-translate-y-0.5 hover:border-ink/45 hover:bg-porcelain",
-  ghost: "border border-transparent text-ink/75 hover:border-ink/10 hover:bg-ink/5 hover:text-ink",
+    "border border-ink/25 bg-white text-ink hover:border-ink hover:bg-smoke",
+  ghost: "border border-transparent text-ink/75 hover:border-ink/20 hover:bg-smoke hover:text-ink",
   danger:
-    "border border-red-700 bg-red-700 text-white shadow-sm hover:-translate-y-0.5 hover:bg-red-800"
+    "border border-red-700 bg-red-700 text-white hover:bg-red-800"
 };
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -29,7 +29,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-racing disabled:cursor-not-allowed disabled:opacity-55",
+        "inline-flex min-h-11 items-center justify-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-copper disabled:cursor-not-allowed disabled:opacity-55",
         variantClass[variant],
         className
       )}
@@ -59,7 +59,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-racing",
+        "inline-flex min-h-11 items-center justify-center gap-2 px-5 py-2.5 text-xs font-black uppercase tracking-[0.08em] transition focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-3 focus-visible:outline-copper",
         variantClass[variant],
         className
       )}

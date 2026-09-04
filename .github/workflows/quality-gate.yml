@@ -1,0 +1,76 @@
+name: Quality gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, typecheck, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # CI-only placeholders. This workflow does not start or connect to a database.
+      DATABASE_URL: postgresql://ci_user:ci_password@127.0.0.1:5432/ci_database?schema=public
+      DIRECT_URL: postgresql://ci_user:ci_password@127.0.0.1:5432/ci_database?schema=public
+      SKIP_SITEMAP_DB: "true"
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-only-placeholder-secret-never-use-in-production
+      ADMIN_EMAIL: ci-admin@example.invalid
+      ADMIN_PASSWORD: ci-only-placeholder-password
+      NEXT_PUBLIC_SITE_URL: https://ci.example.invalid
+      DEALER_NAME: Prestige Motors CI
+      DEALER_PHONE: "+60100000000"
+      DEALER_WHATSAPP: "60100000000"
+      DEALER_EMAIL: ci-dealer@example.invalid
+      SHOWROOM_PREVIEW: "false"
+      GEMINI_API_KEY: ci-only-placeholder-gemini-key
+      CLOUDINARY_CLOUD_NAME: ci-placeholder
+      CLOUDINARY_API_KEY: ci-only-placeholder-cloudinary-key
+      CLOUDINARY_API_SECRET: ci-only-placeholder-cloudinary-secret
+      CRON_SECRET: ci-only-placeholder-cron-secret
+      RESEND_API_KEY: ci-only-placeholder-resend-key
+      ALERT_FROM_EMAIL: Prestige Motors CI <alerts@example.invalid>
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate Prisma schema
+        run: npm exec -- prisma validate
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Check localization catalogs
+        run: npm run i18n:smoke
+
+      - name: Check assistant fallback behavior
+        run: npm run assistant:smoke
+
+      - name: Build production application
+        run: npm run build

@@ -41,61 +41,250 @@ export const enquiryStatusSchema = z.enum([
 
 const currentYear = new Date().getFullYear();
 
-export const carImageInputSchema = z.object({
-  url: storedImageUrlSchema,
-  altText: z.string().min(2, "Image alt text is required.").max(140),
-  width: z.coerce.number().int().positive().default(1600),
-  height: z.coerce.number().int().positive().default(1000),
-  sortOrder: z.coerce.number().int().min(0).default(0)
-});
+function blankStringToNull(value: unknown) {
+  if (typeof value !== "string") {
+    return value;
+  }
 
-export const carInputSchema = z.object({
-  brand: z.string().trim().min(2, "Brand is required.").max(60),
-  model: z.string().trim().min(1, "Model is required.").max(80),
-  year: z.coerce
-    .number()
-    .int()
-    .min(1970, "Year must be 1970 or newer.")
-    .max(currentYear + 1, "Year is too far in the future."),
-  mileage: z.coerce.number().int().min(0).max(2_000_000),
-  transmission: transmissionSchema,
-  fuelType: fuelTypeSchema,
-  engine: z.string().trim().min(2, "Engine is required.").max(80),
-  price: z.coerce.number().positive("Price must be greater than zero."),
-  condition: z.string().trim().min(2, "Condition is required.").max(80),
-  description: z
+  const trimmed = value.trim();
+  return trimmed.length === 0 ? null : trimmed;
+}
+
+function optionalTextSchema(maxLength: number) {
+  return z.preprocess(
+    blankStringToNull,
+    z.string().min(1).max(maxLength).nullable().optional()
+  );
+}
+
+function optionalIntegerSchema(minimum: number, maximum: number) {
+  return z.preprocess(
+    blankStringToNull,
+    z.coerce.number().int().min(minimum).max(maximum).nullable().optional()
+  );
+}
+
+const stockCodeSchema = z.preprocess(
+  (value) => {
+    const normalized = blankStringToNull(value);
+    return typeof normalized === "string" ? normalized.toUpperCase() : normalized;
+  },
+  z
     .string()
-    .trim()
-    .min(1, "Description is required."),
-  features: z
-    .array(z.string().trim().min(1))
-    .min(1, "Add at least one feature."),
-  status: carStatusSchema.default("AVAILABLE"),
-  images: z
-    .array(carImageInputSchema)
-    .min(1, "Upload or provide at least one vehicle image.")
-    .max(12)
-});
+    .min(2, "Stock code must contain at least 2 characters.")
+    .max(40, "Stock code must contain no more than 40 characters.")
+    .regex(
+      /^[A-Z0-9][A-Z0-9._/-]*$/,
+      "Use letters, numbers, dots, underscores, slashes, or hyphens."
+    )
+    .nullable()
+    .optional()
+);
 
-export const carQuerySchema = z.object({
-  search: z.string().trim().optional(),
-  brand: z.string().trim().optional(),
-  fuel: fuelTypeSchema.optional(),
-  transmission: transmissionSchema.optional(),
-  minPrice: z.coerce.number().min(0).optional(),
-  maxPrice: z.coerce.number().min(0).optional(),
-  minYear: z.coerce.number().int().min(1970).optional(),
-  maxYear: z.coerce.number().int().max(currentYear + 1).optional(),
-  sort: z
-    .enum([
-      "newest",
-      "price-asc",
-      "price-desc",
-      "year-asc",
-      "year-desc"
-    ])
-    .default("newest")
-});
+export const carImageInputSchema = z
+  .object({
+    url: storedImageUrlSchema,
+    publicId: optionalTextSchema(500),
+    altText: z.string().trim().min(2, "Image alt text is required.").max(140),
+    width: z.coerce.number().int().min(1).max(12_000).default(1600),
+    height: z.coerce.number().int().min(1).max(12_000).default(1000),
+    sortOrder: z.coerce.number().int().min(0).max(20).optional()
+  })
+  .strict();
+
+export const carInputSchema = z
+  .object({
+    stockCode: stockCodeSchema,
+    brand: z.string().trim().min(2, "Brand is required.").max(60),
+    model: z.string().trim().min(1, "Model is required.").max(80),
+    variant: optionalTextSchema(100),
+    year: z.coerce
+      .number()
+      .int()
+      .min(1970, "Year must be 1970 or newer.")
+      .max(currentYear + 1, "Year is too far in the future."),
+    registrationYear: optionalIntegerSchema(1970, currentYear + 1),
+    mileage: z.coerce.number().int().min(0).max(2_000_000),
+    bodyType: optionalTextSchema(60),
+    exteriorColor: optionalTextSchema(80),
+    interiorColor: optionalTextSchema(80),
+    transmission: transmissionSchema,
+    fuelType: fuelTypeSchema,
+    engine: z.string().trim().min(2, "Engine is required.").max(120),
+    engineCc: optionalIntegerSchema(1, 20_000),
+    seats: optionalIntegerSchema(1, 100),
+    doors: optionalIntegerSchema(1, 10),
+    drivetrain: optionalTextSchema(60),
+    assemblyType: optionalTextSchema(60),
+    showroomLocation: optionalTextSchema(180),
+    price: z.coerce
+      .number()
+      .finite()
+      .min(1, "Price must be greater than zero.")
+      .max(100_000_000, "Price is above the supported listing limit.")
+      .multipleOf(0.01, "Price can have no more than 2 decimal places."),
+    condition: z.string().trim().min(2, "Condition is required.").max(80),
+    description: z
+      .string()
+      .trim()
+      .max(5_000, "Description must contain no more than 5,000 characters."),
+    features: z
+      .array(z.string().trim().min(1).max(120))
+      .max(40, "Add no more than 40 features.")
+      .transform((features) => {
+        const uniqueFeatures = new Map<string, string>();
+
+        for (const feature of features) {
+          const key = feature.toLocaleLowerCase("en-MY");
+          uniqueFeatures.set(key, uniqueFeatures.get(key) ?? feature);
+        }
+
+        return [...uniqueFeatures.values()];
+      }),
+    status: carStatusSchema.default("AVAILABLE"),
+    isPublished: z.boolean().default(false),
+    images: z
+      .array(carImageInputSchema)
+      .max(21, "Add no more than 21 vehicle images.")
+  })
+  .strict()
+  .superRefine((car, context) => {
+    if (car.registrationYear !== null && car.registrationYear !== undefined) {
+      if (car.registrationYear < car.year) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["registrationYear"],
+          message: "Registration year cannot be earlier than manufacture year."
+        });
+      }
+    }
+
+    if (!car.isPublished) {
+      return;
+    }
+
+    const requiredPublicText: Array<{
+      path: "stockCode" | "variant" | "bodyType" | "exteriorColor" | "showroomLocation";
+      value: string | null | undefined;
+      message: string;
+    }> = [
+      {
+        path: "stockCode",
+        value: car.stockCode,
+        message: "Add a stock code before publishing."
+      },
+      {
+        path: "variant",
+        value: car.variant,
+        message: "Add the exact variant before publishing."
+      },
+      {
+        path: "bodyType",
+        value: car.bodyType,
+        message: "Add the body type before publishing."
+      },
+      {
+        path: "exteriorColor",
+        value: car.exteriorColor,
+        message: "Add the exterior colour before publishing."
+      },
+      {
+        path: "showroomLocation",
+        value: car.showroomLocation,
+        message: "Add the viewing location before publishing."
+      }
+    ];
+
+    for (const requirement of requiredPublicText) {
+      if (!requirement.value) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [requirement.path],
+          message: requirement.message
+        });
+      }
+    }
+
+    if (car.registrationYear === null || car.registrationYear === undefined) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["registrationYear"],
+        message: "Add the registration year before publishing."
+      });
+    }
+
+    if (
+      car.fuelType !== "ELECTRIC" &&
+      (car.engineCc === null || car.engineCc === undefined)
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["engineCc"],
+        message: "Add the engine capacity before publishing a combustion or hybrid vehicle."
+      });
+    }
+
+    if (car.description.length < 80) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["description"],
+        message: "Write at least 80 factual characters before publishing."
+      });
+    }
+
+    if (car.features.length < 3) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["features"],
+        message: "Add at least 3 verified features before publishing."
+      });
+    }
+
+    if (car.images.length < 6) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["images"],
+        message: "Add at least 6 genuine vehicle photos before publishing."
+      });
+    }
+  });
+
+export const carQuerySchema = z
+  .object({
+    search: z.string().trim().optional(),
+    brand: z.string().trim().optional(),
+    bodyType: z.string().trim().max(60).optional(),
+    fuel: fuelTypeSchema.optional(),
+    transmission: transmissionSchema.optional(),
+    minPrice: z.coerce.number().min(0).optional(),
+    maxPrice: z.coerce.number().min(0).optional(),
+    maxMileage: z.coerce.number().int().min(0).max(2_000_000).optional(),
+    minYear: z.coerce.number().int().min(1970).optional(),
+    maxYear: z.coerce.number().int().max(currentYear + 1).optional(),
+    sort: z
+      .enum([
+        "newest",
+        "price-asc",
+        "price-desc",
+        "year-asc",
+        "year-desc"
+      ])
+      .default("newest")
+  })
+  .refine(
+    (query) =>
+      query.minPrice === undefined ||
+      query.maxPrice === undefined ||
+      query.minPrice <= query.maxPrice,
+    { message: "Minimum price cannot exceed maximum price.", path: ["minPrice"] }
+  )
+  .refine(
+    (query) =>
+      query.minYear === undefined ||
+      query.maxYear === undefined ||
+      query.minYear <= query.maxYear,
+    { message: "Minimum year cannot exceed maximum year.", path: ["minYear"] }
+  );
 
 export const enquiryInputSchema = z.object({
   name: z.string().trim().min(2, "Name is required.").max(100),
@@ -116,7 +305,8 @@ export const assistantMessageSchema = z.object({
 
 export const assistantRequestSchema = z.object({
   message: z.string().trim().min(1, "Message is required.").max(800),
-  history: z.array(assistantMessageSchema).max(8).default([])
+  history: z.array(assistantMessageSchema).max(8).default([]),
+  locale: z.enum(["en", "ms", "zh"]).default("en")
 });
 
 export const leadStatusSchema = z.enum([

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
+import { getTranslations } from "next-intl/server";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import type { AdminTab } from "@/components/admin/AdminDashboard";
 import type { GrowthSection } from "@/components/admin/growth/AdminGrowthHub";
@@ -9,13 +10,13 @@ import { carInclude, serializeCar } from "@/lib/cars";
 import { prisma } from "@/lib/prisma";
 import type { AdminEnquiry } from "@/types/admin";
 
-export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  robots: {
-    index: false,
-    follow: false
-  }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.adminDashboard");
+  return {
+    title: t("title"),
+    robots: { index: false, follow: false }
+  };
+}
 
 export const dynamic = "force-dynamic";
 

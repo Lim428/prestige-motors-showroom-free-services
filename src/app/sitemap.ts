@@ -7,24 +7,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseEntries: MetadataRoute.Sitemap = [
     {
       url,
-      lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1
     },
     {
-      url: `${url}/#inventory`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.9
+      url: `${url}/compare`,
+      changeFrequency: "weekly",
+      priority: 0.7
+    },
+    {
+      url: `${url}/book-test-drive`,
+      changeFrequency: "weekly",
+      priority: 0.8
+    },
+    {
+      url: `${url}/trade-in`,
+      changeFrequency: "monthly",
+      priority: 0.7
     }
   ];
 
-  if (!process.env.DATABASE_URL) {
+  if (
+    process.env.SKIP_SITEMAP_DB === "true" ||
+    !/^postgres(?:ql)?:\/\//i.test(process.env.DATABASE_URL ?? "")
+  ) {
     return baseEntries;
   }
 
   try {
     const cars = await prisma.car.findMany({
+      where: {
+        isPublished: true
+      },
       select: {
         slug: true,
         updatedAt: true

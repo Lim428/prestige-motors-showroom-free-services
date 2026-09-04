@@ -1,0 +1,90 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+  <rect width="1600" height="1100" fill="#090909"/>
+  <rect x="0" y="0" width="14" height="1100" fill="#e1121b"/>
+  <text x="64" y="70" font-family="Inter" font-size="13" font-weight="700" letter-spacing="2.2" fill="#e1121b">PHASED ROADMAP  /  SEQUENCE BEFORE SPEED</text>
+  <text x="64" y="158" font-family="Oswald" font-size="68" font-weight="700" letter-spacing="-1.8" fill="#ffffff">SHIP IT IN FOUR</text>
+  <text x="64" y="228" font-family="Oswald" font-size="68" font-weight="700" letter-spacing="-1.8" fill="#ffffff">CONTROLLED PHASES.</text>
+  <text x="940" y="120" font-family="Inter" font-size="18" fill="#c9c9c2">Every phase has an outcome, a finite build list,</text>
+  <text x="940" y="150" font-family="Inter" font-size="18" fill="#c9c9c2">and a measurable exit condition.</text>
+  <line x1="96" y1="306" x2="1504" y2="306" stroke="#4b4b46" stroke-width="2"/>
+  <g>
+      <circle cx="108" cy="306" r="28" fill="#e1121b" stroke="#e1121b" stroke-width="2"/>
+      <text x="108" y="315" text-anchor="middle" font-family="Oswald" font-size="25" font-weight="700" fill="#ffffff">0</text>
+      <rect x="64" y="352" width="352" height="610" rx="8" fill="#1f1112" stroke="#e1121b"/>
+      <text x="88" y="398" font-family="Inter" font-size="12" font-weight="700" letter-spacing="1.8" fill="#e1121b">0–2 WEEKS</text>
+      <text x="88" y="444" font-family="Oswald" font-size="30" font-weight="600" fill="#ffffff">STABILIZE TRUTH</text>
+      <line x1="88" y1="468" x2="392" y2="468" stroke="#5f2629"/>
+      <g><circle cx="94" cy="506" r="3.5" fill="#e1121b"/><text x="108" y="511" font-family="Inter" font-size="14" fill="#e2e2dc">Remove production seeding</text></g>
+<g><circle cx="94" cy="556" r="3.5" fill="#e1121b"/><text x="108" y="561" font-family="Inter" font-size="14" fill="#e2e2dc">Replace demo stock</text></g>
+<g><circle cx="94" cy="606" r="3.5" fill="#e1121b"/><text x="108" y="611" font-family="Inter" font-size="14" fill="#e2e2dc">Fail closed on env config</text></g>
+<g><circle cx="94" cy="656" r="3.5" fill="#e1121b"/><text x="108" y="661" font-family="Inter" font-size="14" fill="#e2e2dc">Fix JSON-LD and admin auth</text></g>
+<g><circle cx="94" cy="706" r="3.5" fill="#e1121b"/><text x="108" y="711" font-family="Inter" font-size="14" fill="#e2e2dc">Ship reviewed locale catalogs</text></g>
+<g><circle cx="94" cy="756" r="3.5" fill="#e1121b"/><text x="108" y="761" font-family="Inter" font-size="14" fill="#e2e2dc">Add assistant release smoke test</text></g>
+      <rect x="84" y="812" width="312" height="126" rx="6" fill="#e1121b"/>
+      <text x="102" y="842" font-family="Inter" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#ffffff">EXIT CONDITION</text>
+      <text x="102" y="872" font-family="Inter" font-size="13" fill="#ffffff">— No demo data</text>
+<text x="102" y="896" font-family="Inter" font-size="13" fill="#ffffff">— No mixed-language states</text>
+<text x="102" y="920" font-family="Inter" font-size="13" fill="#ffffff">— Grounded or explicit AI fallback</text>
+    </g>
+<g>
+      <circle cx="490" cy="306" r="28" fill="#1b1b1b" stroke="#686862" stroke-width="2"/>
+      <text x="490" y="315" text-anchor="middle" font-family="Oswald" font-size="25" font-weight="700" fill="#ffffff">1</text>
+      <rect x="446" y="352" width="352" height="610" rx="8" fill="#1b1b1b" stroke="#3a3a36"/>
+      <text x="470" y="398" font-family="Inter" font-size="12" font-weight="700" letter-spacing="1.8" fill="#a9a9a2">2–6 WEEKS</text>
+      <text x="470" y="444" font-family="Oswald" font-size="30" font-weight="600" fill="#ffffff">CONVERT MOBILE</text>
+      <line x1="470" y1="468" x2="774" y2="468" stroke="#44443f"/>
+      <g><circle cx="476" cy="506" r="3.5" fill="#8b8b84"/><text x="490" y="511" font-family="Inter" font-size="14" fill="#e2e2dc">Resolve floating-control collisions</text></g>
+<g><circle cx="476" cy="556" r="3.5" fill="#8b8b84"/><text x="490" y="561" font-family="Inter" font-size="14" fill="#e2e2dc">Launch filter / sort sheet</text></g>
+<g><circle cx="476" cy="606" r="3.5" fill="#8b8b84"/><text x="490" y="611" font-family="Inter" font-size="14" fill="#e2e2dc">Add sticky detail actions</text></g>
+<g><circle cx="476" cy="656" r="3.5" fill="#8b8b84"/><text x="490" y="661" font-family="Inter" font-size="14" fill="#e2e2dc">Confirm / cancel / reschedule bookings</text></g>
+<g><circle cx="476" cy="706" r="3.5" fill="#8b8b84"/><text x="490" y="711" font-family="Inter" font-size="14" fill="#e2e2dc">Convert trade-in to four steps</text></g>
+<g><circle cx="476" cy="756" r="3.5" fill="#8b8b84"/><text x="490" y="761" font-family="Inter" font-size="14" fill="#e2e2dc">Improve compare and empty states</text></g>
+      <rect x="466" y="812" width="312" height="126" rx="6" fill="#252522"/>
+      <text x="484" y="842" font-family="Inter" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#a9a9a2">EXIT CONDITION</text>
+      <text x="484" y="872" font-family="Inter" font-size="13" fill="#ddddda">— Zero content collisions</text>
+<text x="484" y="896" font-family="Inter" font-size="13" fill="#ddddda">— Form completion baseline</text>
+<text x="484" y="920" font-family="Inter" font-size="13" fill="#ddddda">— Lead conversion baseline</text>
+    </g>
+<g>
+      <circle cx="872" cy="306" r="28" fill="#1b1b1b" stroke="#686862" stroke-width="2"/>
+      <text x="872" y="315" text-anchor="middle" font-family="Oswald" font-size="25" font-weight="700" fill="#ffffff">2</text>
+      <rect x="828" y="352" width="352" height="610" rx="8" fill="#1b1b1b" stroke="#3a3a36"/>
+      <text x="852" y="398" font-family="Inter" font-size="12" font-weight="700" letter-spacing="1.8" fill="#a9a9a2">6–12 WEEKS</text>
+      <text x="852" y="444" font-family="Oswald" font-size="30" font-weight="600" fill="#ffffff">PROFESSIONALIZE</text>
+      <line x1="852" y1="468" x2="1156" y2="468" stroke="#44443f"/>
+      <g><circle cx="858" cy="506" r="3.5" fill="#8b8b84"/><text x="872" y="511" font-family="Inter" font-size="14" fill="#e2e2dc">Custom domain and branded email</text></g>
+<g><circle cx="858" cy="556" r="3.5" fill="#8b8b84"/><text x="872" y="561" font-family="Inter" font-size="14" fill="#e2e2dc">Showroom, team, SSM, map, hours</text></g>
+<g><circle cx="858" cy="606" r="3.5" fill="#8b8b84"/><text x="872" y="611" font-family="Inter" font-size="14" fill="#e2e2dc">Real reviews and delivery stories</text></g>
+<g><circle cx="858" cy="656" r="3.5" fill="#8b8b84"/><text x="872" y="661" font-family="Inter" font-size="14" fill="#e2e2dc">12+ photo listing standard</text></g>
+<g><circle cx="858" cy="706" r="3.5" fill="#8b8b84"/><text x="872" y="711" font-family="Inter" font-size="14" fill="#e2e2dc">Roles, audit log, listing QA</text></g>
+<g><circle cx="858" cy="756" r="3.5" fill="#8b8b84"/><text x="872" y="761" font-family="Inter" font-size="14" fill="#e2e2dc">Ownership-cost and Malaysia FAQ</text></g>
+      <rect x="848" y="812" width="312" height="126" rx="6" fill="#252522"/>
+      <text x="866" y="842" font-family="Inter" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#a9a9a2">EXIT CONDITION</text>
+      <text x="866" y="872" font-family="Inter" font-size="13" fill="#ddddda">— Publish-quality score</text>
+<text x="866" y="896" font-family="Inter" font-size="13" fill="#ddddda">— Trust-pack coverage</text>
+<text x="866" y="920" font-family="Inter" font-size="13" fill="#ddddda">— Review and contact lift</text>
+    </g>
+<g>
+      <circle cx="1254" cy="306" r="28" fill="#1b1b1b" stroke="#686862" stroke-width="2"/>
+      <text x="1254" y="315" text-anchor="middle" font-family="Oswald" font-size="25" font-weight="700" fill="#ffffff">3</text>
+      <rect x="1210" y="352" width="352" height="610" rx="8" fill="#1b1b1b" stroke="#3a3a36"/>
+      <text x="1234" y="398" font-family="Inter" font-size="12" font-weight="700" letter-spacing="1.8" fill="#a9a9a2">3–6 MONTHS</text>
+      <text x="1234" y="444" font-family="Oswald" font-size="30" font-weight="600" fill="#ffffff">SCALE OPERATIONS</text>
+      <line x1="1234" y1="468" x2="1538" y2="468" stroke="#44443f"/>
+      <g><circle cx="1240" cy="506" r="3.5" fill="#8b8b84"/><text x="1254" y="511" font-family="Inter" font-size="14" fill="#e2e2dc">Durable job queue and outbox</text></g>
+<g><circle cx="1240" cy="556" r="3.5" fill="#8b8b84"/><text x="1254" y="561" font-family="Inter" font-size="14" fill="#e2e2dc">Lead SLA and stock aging</text></g>
+<g><circle cx="1240" cy="606" r="3.5" fill="#8b8b84"/><text x="1254" y="611" font-family="Inter" font-size="14" fill="#e2e2dc">Trusted conversion analytics</text></g>
+<g><circle cx="1240" cy="656" r="3.5" fill="#8b8b84"/><text x="1254" y="661" font-family="Inter" font-size="14" fill="#e2e2dc">Monitoring and incident runbooks</text></g>
+<g><circle cx="1240" cy="706" r="3.5" fill="#8b8b84"/><text x="1254" y="711" font-family="Inter" font-size="14" fill="#e2e2dc">Backup / restore drills</text></g>
+<g><circle cx="1240" cy="756" r="3.5" fill="#8b8b84"/><text x="1254" y="761" font-family="Inter" font-size="14" fill="#e2e2dc">SEO inventory landing pages</text></g>
+      <rect x="1230" y="812" width="312" height="126" rx="6" fill="#252522"/>
+      <text x="1248" y="842" font-family="Inter" font-size="10.5" font-weight="700" letter-spacing="1.6" fill="#a9a9a2">EXIT CONDITION</text>
+      <text x="1248" y="872" font-family="Inter" font-size="13" fill="#ddddda">— Delivery success rate</text>
+<text x="1248" y="896" font-family="Inter" font-size="13" fill="#ddddda">— Lead response time</text>
+<text x="1248" y="920" font-family="Inter" font-size="13" fill="#ddddda">— View → sale funnel</text>
+    </g>
+  <text x="64" y="1028" font-family="Inter" font-size="11" font-weight="700" letter-spacing="1.7" fill="#8d8d86">PRESTIGE MOTORS  ·  EXECUTION ROADMAP</text>
+  <text x="1482" y="1028" font-family="Inter" font-size="11" font-weight="700" letter-spacing="1.2" fill="#8d8d86">04 / 05</text>
+  <text x="64" y="1065" font-family="Inter" font-size="15" fill="#c9c9c2">Do not start growth experiments until trustworthy inventory, analytics, and release safety exist.</text>
+</svg>

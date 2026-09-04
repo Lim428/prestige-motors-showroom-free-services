@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { KeyboardEvent } from "react";
+import dynamic from "next/dynamic";
 import {
   BellRing,
   CalendarClock,
@@ -10,13 +11,42 @@ import {
   HandCoins,
   UsersRound
 } from "lucide-react";
-import { AppointmentManager } from "@/components/admin/growth/AppointmentManager";
-import { AlertNotificationManager } from "@/components/admin/growth/AlertNotificationManager";
-import { LeadPipeline } from "@/components/admin/growth/LeadPipeline";
-import { SalesAnalytics } from "@/components/admin/growth/SalesAnalytics";
-import { TradeInManager } from "@/components/admin/growth/TradeInManager";
-import { TrustPackEditor } from "@/components/admin/growth/TrustPackEditor";
 import { cn } from "@/lib/utils";
+
+const LeadPipeline = dynamic(() =>
+  import("@/components/admin/growth/LeadPipeline").then((module) => module.LeadPipeline),
+  { loading: GrowthWorkspaceLoading }
+);
+const AppointmentManager = dynamic(() =>
+  import("@/components/admin/growth/AppointmentManager").then(
+    (module) => module.AppointmentManager
+  ),
+  { loading: GrowthWorkspaceLoading }
+);
+const TradeInManager = dynamic(() =>
+  import("@/components/admin/growth/TradeInManager").then(
+    (module) => module.TradeInManager
+  ),
+  { loading: GrowthWorkspaceLoading }
+);
+const AlertNotificationManager = dynamic(() =>
+  import("@/components/admin/growth/AlertNotificationManager").then(
+    (module) => module.AlertNotificationManager
+  ),
+  { loading: GrowthWorkspaceLoading }
+);
+const SalesAnalytics = dynamic(() =>
+  import("@/components/admin/growth/SalesAnalytics").then(
+    (module) => module.SalesAnalytics
+  ),
+  { loading: GrowthWorkspaceLoading }
+);
+const TrustPackEditor = dynamic(() =>
+  import("@/components/admin/growth/TrustPackEditor").then(
+    (module) => module.TrustPackEditor
+  ),
+  { loading: GrowthWorkspaceLoading }
+);
 
 export type GrowthSection =
   | "leads"
@@ -87,6 +117,19 @@ export function AdminGrowthHub({
   className
 }: AdminGrowthHubProps) {
   const [activeSection, setActiveSection] = useState<GrowthSection>(defaultSection);
+  const [visitedSections, setVisitedSections] = useState<Set<GrowthSection>>(
+    () => new Set([defaultSection])
+  );
+
+  function activateSection(section: GrowthSection) {
+    setActiveSection(section);
+    setVisitedSections((current) => {
+      if (current.has(section)) return current;
+      const next = new Set(current);
+      next.add(section);
+      return next;
+    });
+  }
 
   function moveTabFocus(
     event: KeyboardEvent<HTMLButtonElement>,
@@ -108,7 +151,7 @@ export function AdminGrowthHub({
             ? (currentIndex + 1) % sections.length
             : (currentIndex - 1 + sections.length) % sections.length;
     const nextSection = sections[nextIndex];
-    setActiveSection(nextSection.id);
+    activateSection(nextSection.id);
     window.requestAnimationFrame(() => {
       document.getElementById(`growth-${nextSection.id}-tab`)?.focus();
     });
@@ -117,15 +160,15 @@ export function AdminGrowthHub({
   return (
     <section
       aria-labelledby="growth-hub-title"
-      className={cn("rounded-md border border-ink/10 bg-white shadow-sm", className)}
+      className={cn("border border-ink/20 bg-white", className)}
     >
       <div className="border-b border-ink/10 p-4 sm:p-5">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-copper">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-signal">
           Growth workspace
         </p>
         <div className="mt-1 flex flex-col gap-1 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 id="growth-hub-title" className="text-2xl font-black text-ink">
+            <h2 id="growth-hub-title" className="font-display text-3xl font-black uppercase leading-none tracking-[-0.01em] text-ink">
               Sales operations
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-ink/65">
@@ -142,7 +185,7 @@ export function AdminGrowthHub({
       <div className="grid min-h-[680px] lg:grid-cols-[250px_minmax(0,1fr)]">
         <nav
           aria-label="Sales operations sections"
-          className="border-b border-ink/10 bg-smoke/55 p-2 lg:border-b-0 lg:border-r"
+          className="border-b border-ink/15 bg-smoke/70 p-2 lg:border-b-0 lg:border-r"
         >
           <div
             role="tablist"
@@ -162,25 +205,25 @@ export function AdminGrowthHub({
                   aria-selected={isActive}
                   aria-controls={`growth-${section.id}-panel`}
                   tabIndex={isActive ? 0 : -1}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={() => activateSection(section.id)}
                   onKeyDown={(event) => moveTabFocus(event, sections.indexOf(section))}
                   className={cn(
-                    "flex min-h-14 items-center gap-3 rounded-md px-3 py-2 text-left outline-none transition focus:ring-2 focus:ring-ink/25 focus:ring-offset-1",
+                    "flex min-h-14 items-center gap-3 border-l-[3px] px-3 py-2 text-left outline-none transition focus:ring-2 focus:ring-signal/25 focus:ring-offset-1",
                     isActive
-                      ? "bg-ink text-white shadow-sm"
-                      : "text-ink/70 hover:bg-white hover:text-ink"
+                      ? "border-l-signal bg-ink text-white"
+                      : "border-l-transparent text-ink/70 hover:border-l-ink/25 hover:bg-white hover:text-ink"
                   )}
                 >
                   <span
                     className={cn(
-                      "grid h-9 w-9 shrink-0 place-items-center rounded-md",
-                      isActive ? "bg-white/10" : "bg-white"
+                      "grid h-9 w-9 shrink-0 place-items-center border",
+                      isActive ? "border-white/15 bg-white/10" : "border-ink/10 bg-white"
                     )}
                   >
                     <Icon className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-black">
+                    <span className="block truncate font-display text-base font-black uppercase leading-none tracking-wide">
                       {section.label}
                     </span>
                     <span
@@ -201,6 +244,8 @@ export function AdminGrowthHub({
         <div className="min-w-0 p-3 sm:p-5">
           {sections.map((section) => {
             const isActive = activeSection === section.id;
+
+            if (!visitedSections.has(section.id)) return null;
 
             return (
               <div
@@ -224,5 +269,16 @@ export function AdminGrowthHub({
         </div>
       </div>
     </section>
+  );
+}
+
+function GrowthWorkspaceLoading() {
+  return (
+    <div
+      role="status"
+      className="grid min-h-72 place-items-center border border-dashed border-ink/20 bg-smoke/35 px-5 text-center"
+    >
+      <p className="text-sm font-bold text-ink/65">Loading workspace…</p>
+    </div>
   );
 }

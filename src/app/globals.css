@@ -4,9 +4,10 @@
 
 :root {
   color-scheme: light;
-  background: #f4f1e9;
-  --page-background: #f4f1e9;
-  --page-foreground: #171714;
+  background: #f1f1ed;
+  --page-background: #f1f1ed;
+  --page-foreground: #090909;
+  --signal-red: #e1121b;
 }
 
 * {
@@ -15,18 +16,18 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
   background: var(--page-background);
 }
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 8% -8%, rgba(212, 181, 111, 0.14), transparent 34rem),
-    linear-gradient(180deg, #fbfaf7 0%, #f4f1e9 54%, #fbfaf7 100%);
+  min-height: 100vh;
+  background: var(--page-background);
   color: var(--page-foreground);
   font-family:
-    Aptos, "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    sans-serif;
+    "Inter Variable", "Segoe UI", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -34,6 +35,8 @@ body {
 h1,
 h2,
 h3 {
+  font-family:
+    "Oswald Variable", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
   text-wrap: balance;
 }
 
@@ -42,7 +45,7 @@ p {
 }
 
 ::selection {
-  background: #171714;
+  background: #e1121b;
   color: #ffffff;
 }
 
@@ -63,19 +66,42 @@ textarea {
 }
 
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 3px solid #0f5847;
+  outline: 3px solid #e1121b;
   outline-offset: 3px;
 }
 
 input,
 select,
 textarea {
-  accent-color: #0f5847;
+  accent-color: #e1121b;
 }
 
 input::placeholder,
 textarea::placeholder {
   color: #77746b;
+  opacity: 1;
+}
+
+/* Keep supporting copy readable even when older components request a lighter utility. */
+.text-ink\/35,
+.text-ink\/40,
+.text-ink\/45,
+.text-ink\/50,
+.text-ink\/55 {
+  color: rgb(9 9 9 / 0.65);
+}
+
+.text-white\/40,
+.text-white\/50 {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.placeholder\:text-ink\/35::placeholder,
+.placeholder\:text-ink\/40::placeholder,
+.placeholder\:text-ink\/45::placeholder,
+.placeholder\:text-ink\/50::placeholder,
+.placeholder\:text-ink\/55::placeholder {
+  color: #686862;
   opacity: 1;
 }
 
@@ -85,8 +111,8 @@ textarea::placeholder {
   top: 1rem;
   z-index: 100;
   transform: translateY(-180%);
-  border-radius: 0.75rem;
-  background: #171714;
+  border-radius: 0;
+  background: #090909;
   color: #ffffff;
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
@@ -99,7 +125,7 @@ textarea::placeholder {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #e7e2d8 0%, #fbfaf7 50%, #e7e2d8 100%);
+  background: linear-gradient(90deg, #deded8 0%, #f8f8f5 50%, #deded8 100%);
   background-size: 600px 100%;
 }
 

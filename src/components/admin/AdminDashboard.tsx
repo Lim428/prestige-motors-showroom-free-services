@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
@@ -29,12 +30,14 @@ import { EnquiryManager } from "@/components/admin/EnquiryManager";
 import { AdminGrowthHub } from "@/components/admin/growth/AdminGrowthHub";
 import type { GrowthSection } from "@/components/admin/growth/AdminGrowthHub";
 import { adminFetch } from "@/components/admin/adminFetch";
+import { vehicleName } from "@/lib/car-display";
 import { titleCaseEnum } from "@/lib/format";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
 export type AdminTab = "inventory" | "enquiries" | "growth";
 type Tab = AdminTab;
+const adminTabs: Tab[] = ["inventory", "enquiries", "growth"];
 type InventoryStatusFilter = "ALL" | CarStatus;
 type EnquiryStatusFilter = "ALL" | EnquiryStatus;
 
@@ -42,9 +45,9 @@ const carStatuses: CarStatus[] = ["AVAILABLE", "RESERVED", "SOLD"];
 const number = new Intl.NumberFormat("en-MY");
 
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/15";
 const iconButtonClassName =
-  "grid h-11 w-11 shrink-0 place-items-center rounded-md border border-transparent outline-none transition focus:ring-2 focus:ring-ink/25 focus:ring-offset-2";
+  "grid h-11 w-11 shrink-0 place-items-center border border-transparent outline-none transition focus:ring-2 focus:ring-ink/25 focus:ring-offset-2";
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -69,6 +72,7 @@ export function AdminDashboard({
   adminId: string;
   adminName: string;
 }) {
+  const formTriggerRef = useRef<HTMLElement | null>(null);
   const [cars, setCars] = useState(initialCars);
   const [enquiries, setEnquiries] = useState(initialEnquiries);
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -104,6 +108,11 @@ export function AdminDashboard({
         car.year,
         car.brand,
         car.model,
+        car.variant,
+        car.stockCode,
+        car.bodyType,
+        car.exteriorColor,
+        car.showroomLocation,
         car.engine,
         car.condition,
         car.transmission,
@@ -150,21 +159,50 @@ export function AdminDashboard({
     });
   }
 
+  function rememberFormTrigger() {
+    formTriggerRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  }
+
+  function moveAdminTabFocus(event: KeyboardEvent<HTMLButtonElement>, currentTab: Tab) {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+
+    event.preventDefault();
+    const currentIndex = adminTabs.indexOf(currentTab);
+    const nextIndex =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? adminTabs.length - 1
+          : event.key === "ArrowRight"
+            ? (currentIndex + 1) % adminTabs.length
+            : (currentIndex - 1 + adminTabs.length) % adminTabs.length;
+    const nextTab = adminTabs[nextIndex];
+
+    setTab(nextTab);
+    window.requestAnimationFrame(() => document.getElementById(`${nextTab}-tab`)?.focus());
+  }
+
   function openCreate() {
+    rememberFormTrigger();
     setEditingCar(undefined);
     setIsFormOpen(true);
     focusVehicleForm();
   }
 
   function openEdit(car: SerializedCar) {
+    rememberFormTrigger();
     setEditingCar(car);
     setIsFormOpen(true);
     focusVehicleForm();
   }
 
   function closeForm() {
+    const trigger = formTriggerRef.current;
+    formTriggerRef.current = null;
     setIsFormOpen(false);
     setEditingCar(undefined);
+    window.requestAnimationFrame(() => trigger?.focus({ preventScroll: true }));
   }
 
   function onSaved(car: SerializedCar) {
@@ -176,7 +214,7 @@ export function AdminDashboard({
     });
     closeForm();
     setLiveMessage(
-      `${car.year} ${car.brand} ${car.model} was saved successfully.`
+      `${vehicleName(car)} was saved successfully.`
     );
   }
 
@@ -208,7 +246,7 @@ export function AdminDashboard({
         current.map((item) => (item.id === car.id ? updatedCar : item))
       );
       setLiveMessage(
-        `${car.year} ${car.brand} ${car.model} is now ${titleCaseEnum(status)}.`
+        `${vehicleName(car)} is now ${titleCaseEnum(status)}.`
       );
     } catch (error) {
       setCars((current) =>
@@ -245,7 +283,7 @@ export function AdminDashboard({
       );
       setCars((current) => current.filter((item) => item.id !== car.id));
       setConfirmDeleteId(null);
-      setLiveMessage(`${car.year} ${car.brand} ${car.model} was deleted.`);
+      setLiveMessage(`${vehicleName(car)} was deleted.`);
     } catch (error) {
       setCarErrors((current) => ({
         ...current,
@@ -280,10 +318,10 @@ export function AdminDashboard({
       id="admin-content"
       className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8"
     >
-      <div className="rounded-md bg-ink px-4 py-4 text-white shadow-panel sm:px-5">
+      <div className="border-b-4 border-copper bg-ink px-4 py-4 text-white sm:px-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-white text-sm font-black text-ink">
+            <div className="grid h-11 w-11 shrink-0 place-items-center bg-white font-display text-xl font-black text-ink">
               PM
             </div>
             <div className="min-w-0">
@@ -319,7 +357,7 @@ export function AdminDashboard({
           <p className="text-xs font-black uppercase tracking-[0.18em] text-copper">
             Live workspace
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-[-0.035em] text-ink sm:text-4xl">
+          <h1 className="mt-2 font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.035em] text-ink sm:text-6xl">
             Dealership overview
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/70">
@@ -370,12 +408,12 @@ export function AdminDashboard({
         />
       </section>
 
-      <div className="mt-5 rounded-md border border-ink/10 bg-white shadow-sm">
+      <div className="mt-5 border border-ink/20 bg-white">
         <div className="flex flex-col gap-3 border-b border-ink/10 p-3 sm:flex-row sm:items-center sm:justify-between">
           <div
             role="tablist"
             aria-label="Admin workspace"
-            className="grid grid-cols-3 rounded-md bg-smoke p-1"
+            className="grid grid-cols-3 border border-ink/15 bg-smoke p-1"
           >
             <button
               id="inventory-tab"
@@ -383,9 +421,11 @@ export function AdminDashboard({
               role="tab"
               aria-selected={tab === "inventory"}
               aria-controls="inventory-panel"
+              tabIndex={tab === "inventory" ? 0 : -1}
               onClick={() => setTab("inventory")}
+              onKeyDown={(event) => moveAdminTabFocus(event, "inventory")}
               className={cn(
-                "min-h-11 rounded px-4 text-sm font-bold outline-none transition focus:ring-2 focus:ring-ink/25",
+                "min-h-11 px-4 text-xs font-black uppercase tracking-[0.07em] outline-none transition focus:ring-2 focus:ring-ink/25",
                 tab === "inventory"
                   ? "bg-ink text-white shadow-sm"
                   : "text-ink/70 hover:bg-white hover:text-ink"
@@ -400,9 +440,11 @@ export function AdminDashboard({
               role="tab"
               aria-selected={tab === "enquiries"}
               aria-controls="enquiries-panel"
+              tabIndex={tab === "enquiries" ? 0 : -1}
               onClick={() => setTab("enquiries")}
+              onKeyDown={(event) => moveAdminTabFocus(event, "enquiries")}
               className={cn(
-                "min-h-11 rounded px-4 text-sm font-bold outline-none transition focus:ring-2 focus:ring-ink/25",
+                "min-h-11 px-4 text-xs font-black uppercase tracking-[0.07em] outline-none transition focus:ring-2 focus:ring-ink/25",
                 tab === "enquiries"
                   ? "bg-ink text-white shadow-sm"
                   : "text-ink/70 hover:bg-white hover:text-ink"
@@ -410,7 +452,7 @@ export function AdminDashboard({
             >
               Enquiries
               {newEnquiries > 0 ? (
-                <span className="ml-2 rounded-full bg-copper px-2 py-0.5 text-[11px] text-white">
+                <span className="ml-2 bg-copper px-2 py-0.5 text-[11px] text-white">
                   {newEnquiries} new
                 </span>
               ) : null}
@@ -421,9 +463,11 @@ export function AdminDashboard({
               role="tab"
               aria-selected={tab === "growth"}
               aria-controls="growth-panel"
+              tabIndex={tab === "growth" ? 0 : -1}
               onClick={() => setTab("growth")}
+              onKeyDown={(event) => moveAdminTabFocus(event, "growth")}
               className={cn(
-                "min-h-11 rounded px-3 text-sm font-bold outline-none transition focus:ring-2 focus:ring-ink/25 sm:px-4",
+                "min-h-11 px-3 text-xs font-black uppercase tracking-[0.07em] outline-none transition focus:ring-2 focus:ring-ink/25 sm:px-4",
                 tab === "growth"
                   ? "bg-ink text-white shadow-sm"
                   : "text-ink/70 hover:bg-white hover:text-ink"
@@ -464,7 +508,7 @@ export function AdminDashboard({
 
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h2 className="text-lg font-black text-ink">Vehicle inventory</h2>
+                <h2 className="font-display text-2xl font-black uppercase text-ink">Vehicle inventory</h2>
                 <p className="mt-1 text-sm text-ink/65">
                   {filteredCars.length} of {cars.length} vehicles shown
                 </p>
@@ -488,7 +532,7 @@ export function AdminDashboard({
                       type="button"
                       onClick={() => setInventoryQuery("")}
                       aria-label="Clear inventory search"
-                      className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-md text-ink/60 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-ink/20"
+                      className="absolute right-1 top-1 grid h-9 w-9 place-items-center text-ink/60 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-ink/20"
                     >
                       <X className="h-4 w-4" aria-hidden="true" />
                     </button>
@@ -516,12 +560,13 @@ export function AdminDashboard({
               </div>
             </div>
 
-            <div className="mt-4 overflow-hidden rounded-md border border-ink/10">
+            <div className="mt-4 overflow-hidden border border-ink/15">
               {filteredCars.length > 0 ? (
                 <div className="divide-y divide-ink/10">
                   {filteredCars.map((car) => {
                     const isPending = pendingCarIds.has(car.id);
                     const isConfirmingDelete = confirmDeleteId === car.id;
+                    const carName = vehicleName(car);
 
                     return (
                       <article
@@ -529,7 +574,7 @@ export function AdminDashboard({
                         aria-busy={isPending}
                         className="grid grid-cols-[84px_minmax(0,1fr)] gap-3 bg-white p-3 transition hover:bg-smoke/55 sm:grid-cols-[104px_minmax(0,1fr)] sm:gap-4 xl:grid-cols-[104px_minmax(0,1fr)_auto] xl:items-center"
                       >
-                        <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-zinc-100">
+                        <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
                           {car.images[0] ? (
                             <Image
                               src={runtimeImageUrl(car.images[0].url)}
@@ -550,9 +595,14 @@ export function AdminDashboard({
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="truncate text-base font-black text-ink sm:text-lg">
-                              {car.year} {car.brand} {car.model}
+                              {carName}
                             </h3>
                             <StatusBadge status={car.status} />
+                            {!car.isPublished ? (
+                              <span className="rounded-full bg-zinc-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-zinc-700">
+                                Draft
+                              </span>
+                            ) : null}
                           </div>
                           <p className="mt-1.5 text-sm font-semibold text-ink/75">
                             {car.formattedPrice}
@@ -560,6 +610,12 @@ export function AdminDashboard({
                             {formatAdminMileage(car.mileage)}
                           </p>
                           <p className="mt-1 truncate text-xs text-ink/65">
+                            {car.stockCode ? (
+                              <>
+                                Stock {car.stockCode}
+                                <span aria-hidden="true"> · </span>
+                              </>
+                            ) : null}
                             {titleCaseEnum(car.transmission)}
                             <span aria-hidden="true"> · </span>
                             {titleCaseEnum(car.fuelType)}
@@ -588,7 +644,7 @@ export function AdminDashboard({
                           ) : null}
                           <label>
                             <span className="sr-only">
-                              Status for {car.year} {car.brand} {car.model}
+                              Status for {carName}
                             </span>
                             <select
                               value={car.status}
@@ -608,22 +664,33 @@ export function AdminDashboard({
                               ))}
                             </select>
                           </label>
-                          <Link
-                            href={`/cars/${car.slug}`}
-                            aria-label={`View ${car.year} ${car.brand} ${car.model} listing`}
-                            className={`${iconButtonClassName} text-ink/65 hover:bg-ink/5 hover:text-ink`}
-                          >
-                            <ExternalLink
-                              className="h-4 w-4"
-                              aria-hidden="true"
-                            />
-                          </Link>
+                          {car.isPublished ? (
+                            <Link
+                              href={`/cars/${car.slug}`}
+                              aria-label={`View ${carName} listing`}
+                              className={`${iconButtonClassName} text-ink/65 hover:bg-ink/5 hover:text-ink`}
+                            >
+                              <ExternalLink
+                                className="h-4 w-4"
+                                aria-hidden="true"
+                              />
+                            </Link>
+                          ) : (
+                            <span
+                              role="img"
+                              className={`${iconButtonClassName} cursor-not-allowed text-ink/25`}
+                              title="Publish this draft to open its showroom page"
+                              aria-label="Draft is not visible in the public showroom"
+                            >
+                              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                            </span>
+                          )}
                           <button
                             type="button"
                             onClick={() => openEdit(car)}
                             disabled={isPending}
                             className={`${iconButtonClassName} text-ink/65 hover:bg-ink/5 hover:text-ink disabled:cursor-not-allowed disabled:opacity-45`}
-                            aria-label={`Edit ${car.year} ${car.brand} ${car.model}`}
+                            aria-label={`Edit ${carName}`}
                           >
                             <Pencil className="h-4 w-4" aria-hidden="true" />
                           </button>
@@ -634,7 +701,7 @@ export function AdminDashboard({
                                 type="button"
                                 onClick={() => setConfirmDeleteId(null)}
                                 disabled={isPending}
-                                className="h-11 rounded-md px-3 text-sm font-bold text-ink/70 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-ink/20"
+                                className="h-11 px-3 text-xs font-black uppercase tracking-[0.06em] text-ink/70 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-ink/20"
                               >
                                 Cancel
                               </button>
@@ -642,7 +709,7 @@ export function AdminDashboard({
                                 type="button"
                                 onClick={() => deleteCar(car)}
                                 disabled={isPending}
-                                className="h-11 rounded-md bg-red-700 px-3 text-sm font-bold text-white outline-none transition hover:bg-red-800 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 disabled:opacity-50"
+                                className="h-11 bg-red-700 px-3 text-xs font-black uppercase tracking-[0.06em] text-white outline-none transition hover:bg-red-800 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 disabled:opacity-50"
                               >
                                 Delete vehicle
                               </button>
@@ -653,7 +720,7 @@ export function AdminDashboard({
                               onClick={() => setConfirmDeleteId(car.id)}
                               disabled={isPending}
                               className={`${iconButtonClassName} text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-45`}
-                              aria-label={`Delete ${car.year} ${car.brand} ${car.model}`}
+                              aria-label={`Delete ${carName}`}
                             >
                               <Trash2 className="h-4 w-4" aria-hidden="true" />
                             </button>
@@ -682,7 +749,7 @@ export function AdminDashboard({
                         setInventoryQuery("");
                         setInventoryStatus("ALL");
                       }}
-                      className="mt-4 h-11 rounded-md border border-ink/15 px-4 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                      className="mt-4 h-11 border border-ink/15 px-4 text-xs font-black uppercase tracking-[0.06em] text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
                     >
                       Clear filters
                     </button>
@@ -743,13 +810,13 @@ function MetricButton({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "group flex min-h-24 items-center gap-3 rounded-md border bg-white p-4 text-left shadow-sm outline-none transition hover:-translate-y-0.5 hover:border-ink/25 hover:shadow-panel focus:ring-2 focus:ring-ink/25 focus:ring-offset-2",
+        "group flex min-h-24 items-center gap-3 border bg-white p-4 text-left outline-none transition hover:border-copper focus:ring-2 focus:ring-ink/25 focus:ring-offset-2",
         active ? "border-ink ring-1 ring-ink/10" : "border-ink/10"
       )}
     >
       <span
         className={cn(
-          "grid h-10 w-10 shrink-0 place-items-center rounded-md transition",
+          "grid h-10 w-10 shrink-0 place-items-center transition",
           active
             ? "bg-ink text-white"
             : "bg-smoke text-ink/65 group-hover:bg-ink group-hover:text-white"
@@ -758,7 +825,7 @@ function MetricButton({
         {icon}
       </span>
       <span className="min-w-0">
-        <span className="block text-2xl font-black leading-none text-ink">
+        <span className="block font-display text-3xl font-black leading-none text-ink">
           {value}
         </span>
         <span className="mt-1.5 block truncate text-xs font-bold uppercase tracking-[0.1em] text-ink/65">

@@ -10,7 +10,10 @@ export type ShortlistCar = {
   slug: string;
   brand: string;
   model: string;
+  variant?: string | null;
+  stockCode?: string | null;
   year: number;
+  registrationYear?: number | null;
   price: number;
   formattedPrice: string;
   imageUrl: string | null;
@@ -19,6 +22,15 @@ export type ShortlistCar = {
   transmission: string;
   fuelType: string;
   engine: string;
+  engineCc?: number | null;
+  bodyType?: string | null;
+  exteriorColor?: string | null;
+  interiorColor?: string | null;
+  seats?: number | null;
+  doors?: number | null;
+  drivetrain?: string | null;
+  assemblyType?: string | null;
+  showroomLocation?: string | null;
   condition: string;
   status: string;
   features: string[];
@@ -28,6 +40,18 @@ type StoredShortlist = {
   version: 1;
   cars: ShortlistCar[];
 };
+
+function isOptionalString(value: unknown) {
+  return value === undefined || value === null || typeof value === "string";
+}
+
+function isOptionalNumber(value: unknown) {
+  return (
+    value === undefined ||
+    value === null ||
+    (typeof value === "number" && Number.isFinite(value))
+  );
+}
 
 function isShortlistCar(value: unknown): value is ShortlistCar {
   if (!value || typeof value !== "object") {
@@ -40,15 +64,30 @@ function isShortlistCar(value: unknown): value is ShortlistCar {
     typeof car.slug === "string" &&
     typeof car.brand === "string" &&
     typeof car.model === "string" &&
+    isOptionalString(car.variant) &&
+    isOptionalString(car.stockCode) &&
     typeof car.year === "number" &&
+    Number.isFinite(car.year) &&
+    isOptionalNumber(car.registrationYear) &&
     typeof car.price === "number" &&
+    Number.isFinite(car.price) &&
     typeof car.formattedPrice === "string" &&
     (car.imageUrl === null || typeof car.imageUrl === "string") &&
     typeof car.imageAlt === "string" &&
     typeof car.mileage === "number" &&
+    Number.isFinite(car.mileage) &&
     typeof car.transmission === "string" &&
     typeof car.fuelType === "string" &&
     typeof car.engine === "string" &&
+    isOptionalNumber(car.engineCc) &&
+    isOptionalString(car.bodyType) &&
+    isOptionalString(car.exteriorColor) &&
+    isOptionalString(car.interiorColor) &&
+    isOptionalNumber(car.seats) &&
+    isOptionalNumber(car.doors) &&
+    isOptionalString(car.drivetrain) &&
+    isOptionalString(car.assemblyType) &&
+    isOptionalString(car.showroomLocation) &&
     typeof car.condition === "string" &&
     typeof car.status === "string" &&
     Array.isArray(car.features) &&
@@ -64,7 +103,10 @@ export function toShortlistCar(car: SerializedCar): ShortlistCar {
     slug: car.slug,
     brand: car.brand,
     model: car.model,
+    variant: car.variant,
+    stockCode: car.stockCode,
     year: car.year,
+    registrationYear: car.registrationYear,
     price: car.price,
     formattedPrice: car.formattedPrice,
     imageUrl: image?.url ?? null,
@@ -73,6 +115,15 @@ export function toShortlistCar(car: SerializedCar): ShortlistCar {
     transmission: car.transmission,
     fuelType: car.fuelType,
     engine: car.engine,
+    engineCc: car.engineCc,
+    bodyType: car.bodyType,
+    exteriorColor: car.exteriorColor,
+    interiorColor: car.interiorColor,
+    seats: car.seats,
+    doors: car.doors,
+    drivetrain: car.drivetrain,
+    assemblyType: car.assemblyType,
+    showroomLocation: car.showroomLocation,
     condition: car.condition,
     status: car.status,
     features: car.features

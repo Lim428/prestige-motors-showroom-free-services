@@ -1,31 +1,36 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, Camera, CheckCircle2, ClipboardCheck, Handshake, ShieldCheck } from "lucide-react";
 import { TradeInForm } from "@/components/growth/TradeInForm";
+import { siteUrl } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Trade In Your Car",
-  description: "Share your vehicle details and photos to request a direct trade-in appraisal from Prestige Motors."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.tradeIn");
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: { canonical: `${siteUrl()}/trade-in` }
+  };
+}
 
 export default function TradeInPage() {
   return (
     <main>
-      <section className="relative overflow-hidden bg-ink text-white">
-        <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-champagne/10 blur-3xl" aria-hidden="true" />
-        <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <section className="border-b-8 border-racing bg-ink text-white">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <Link
             href="/#inventory"
-            className="inline-flex items-center gap-2 text-sm font-black text-white/60 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-champagne focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back to showroom
           </Link>
           <div className="mt-8 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-champagne">
+            <p className="border-l-8 border-racing pl-3 text-xs font-black uppercase tracking-[0.24em] text-white/70">
               Your next car starts here
             </p>
-            <h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-6xl">
+            <h1 className="mt-5 max-w-4xl font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.025em] sm:text-7xl">
               Turn your current car into your next move.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/65 sm:text-lg">
@@ -40,8 +45,8 @@ export default function TradeInPage() {
         <TradeInForm />
 
         <aside className="space-y-5">
-          <section className="rounded-[1.5rem] border border-ink/10 bg-white p-5 shadow-panel sm:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-copper">
+          <section className="border border-ink/15 bg-white p-5 sm:p-6">
+            <p className="border-l-[6px] border-racing pl-3 text-xs font-black uppercase tracking-[0.18em] text-racing">
               Three simple steps
             </p>
             <ol className="mt-5 space-y-5">
@@ -63,7 +68,7 @@ export default function TradeInPage() {
                 }
               ].map(({ icon: Icon, title, copy }, index) => (
                 <li key={title} className="flex gap-4">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-smoke text-copper">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center border border-ink/15 bg-smoke text-racing">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <div>
@@ -76,9 +81,9 @@ export default function TradeInPage() {
             </ol>
           </section>
 
-          <section className="rounded-[1.5rem] bg-racing p-5 text-white shadow-panel sm:p-6">
-            <ShieldCheck className="h-6 w-6 text-champagne" aria-hidden="true" />
-            <h2 className="mt-4 text-xl font-black">Clear, private, no obligation</h2>
+          <section className="border-l-8 border-racing bg-ink p-5 text-white sm:p-6">
+            <ShieldCheck className="h-6 w-6 text-racing" aria-hidden="true" />
+            <h2 className="mt-4 font-display text-2xl font-black uppercase leading-none">Clear, private, no obligation</h2>
             <ul className="mt-4 space-y-3">
               {[
                 "Your information stays with the showroom team.",
@@ -86,7 +91,7 @@ export default function TradeInPage() {
                 "A final offer follows an in-person inspection and document check."
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-xs leading-5 text-white/70">
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-champagne" aria-hidden="true" />
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-racing" aria-hidden="true" />
                   {item}
                 </li>
               ))}

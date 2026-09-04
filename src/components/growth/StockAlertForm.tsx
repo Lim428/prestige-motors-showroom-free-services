@@ -21,7 +21,7 @@ export type StockAlertFormProps = {
 type FormState = "idle" | "success" | "error";
 
 const fieldClass =
-  "mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-racing/20";
+  "mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20";
 
 export function StockAlertForm({
   carId,
@@ -112,20 +112,20 @@ export function StockAlertForm({
       onSubmit={onSubmit}
       aria-busy={isPending}
       className={cn(
-        "overflow-hidden rounded-[1.5rem] border border-ink/10 bg-white shadow-panel",
+        "overflow-hidden border border-ink/15 bg-white",
         className
       )}
     >
-      <div className={cn("bg-ink text-white", compact ? "p-5" : "p-5 sm:p-6")}>
+      <div className={cn("border-b-8 border-racing bg-ink text-white", compact ? "p-5" : "p-5 sm:p-6")}>
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-champagne text-ink">
+          <span className="grid h-10 w-10 shrink-0 place-items-center border border-white/25 bg-racing text-white">
             <BellRing className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-champagne">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/60">
               Never miss the right car
             </p>
-            <h2 className="mt-2 text-xl font-black tracking-tight">
+            <h2 className="mt-3 font-display text-2xl font-black uppercase leading-none tracking-[-0.02em]">
               {carId ? "Watch this vehicle" : "Create a showroom alert"}
             </h2>
             <p className="mt-2 text-sm leading-6 text-white/60">
@@ -158,7 +158,7 @@ export function StockAlertForm({
                     onChange={() => setAlertType(value)}
                     className="peer sr-only"
                   />
-                  <span className="grid min-h-11 place-items-center rounded-xl border border-ink/10 bg-smoke px-2 text-center text-xs font-black text-ink/60 transition peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-racing peer-focus-visible:ring-offset-2">
+                  <span className="grid min-h-11 place-items-center border border-ink/20 bg-smoke px-2 text-center text-xs font-black uppercase tracking-[0.04em] text-ink/60 transition peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-racing peer-focus-visible:ring-offset-2">
                     {label}
                   </span>
                 </label>
@@ -210,7 +210,7 @@ export function StockAlertForm({
                     onChange={() => setChannel(value)}
                     className="peer sr-only"
                   />
-                  <span className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-ink/10 bg-smoke px-2 text-xs font-black text-ink/60 transition peer-checked:border-racing peer-checked:bg-racing peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-racing peer-focus-visible:ring-offset-2">
+                  <span className="flex min-h-11 items-center justify-center gap-1.5 border border-ink/20 bg-smoke px-2 text-xs font-black uppercase tracking-[0.04em] text-ink/60 transition peer-checked:border-racing peer-checked:bg-racing peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-racing peer-focus-visible:ring-offset-2">
                     <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                     {label}
                   </span>
@@ -238,8 +238,8 @@ export function StockAlertForm({
             ) : null}
           </div>
 
-          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl bg-smoke p-4">
-            <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 rounded border-ink/20" />
+          <label className="mt-5 flex cursor-pointer items-start gap-3 border-l-4 border-ink bg-smoke p-4">
+            <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 border-ink/20 accent-racing" />
             <span className="text-xs leading-5 text-ink/60">
               I agree to receive a verification email and the selected vehicle alerts after I
               confirm my address. I can stop them at any time.
@@ -252,8 +252,8 @@ export function StockAlertForm({
             role={state === "error" ? "alert" : "status"}
             aria-live={state === "error" ? "assertive" : "polite"}
             className={cn(
-              "mt-4 flex items-start gap-2 rounded-xl px-4 py-3 text-sm font-semibold leading-6",
-              state === "success" ? "bg-racing/10 text-racing" : "bg-red-50 text-red-700"
+              "mt-4 flex items-start gap-2 border-l-4 px-4 py-3 text-sm font-semibold leading-6",
+              state === "success" ? "border-emerald-600 bg-emerald-50 text-emerald-800" : "border-red-700 bg-red-50 text-red-700"
             )}
           >
             {state === "success" ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /> : null}
@@ -264,7 +264,12 @@ export function StockAlertForm({
         <button
           type="submit"
           disabled={isPending || state === "success"}
-          className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-racing px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+          className={cn(
+            "mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 px-5 text-sm font-black uppercase tracking-[0.08em] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70",
+            state === "success"
+              ? "bg-amber-600 focus-visible:ring-amber-500/30"
+              : "bg-racing hover:bg-copper focus-visible:ring-racing/30"
+          )}
         >
           {state === "success" ? <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> : <Send className="h-4 w-4" aria-hidden="true" />}
           {isPending

@@ -89,7 +89,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const car = await prisma.car.findFirst({
-    where: { OR: [{ id }, { slug: id }] },
+    where: { isPublished: true, OR: [{ id }, { slug: id }] },
     include: {
       trustProfile: true,
       trustDocuments: {

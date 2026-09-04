@@ -25,19 +25,19 @@ export default function VehicleLoading() {
 
         <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.65fr)] lg:gap-10">
           <div>
-            <div className="skeleton aspect-[4/3] animate-shimmer rounded-[1.5rem] sm:aspect-[16/10]" />
+            <div className="skeleton aspect-[4/3] animate-shimmer sm:aspect-[16/10]" />
             <div className="mt-4 flex gap-3">
               {Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
-                  className="skeleton aspect-[4/3] w-24 shrink-0 animate-shimmer rounded-xl"
+                  className="skeleton aspect-[4/3] w-24 shrink-0 animate-shimmer"
                 />
               ))}
             </div>
           </div>
 
           <div className="space-y-6">
-            <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-panel">
+            <div className="overflow-hidden border border-ink/15 bg-white">
               <div className="bg-ink p-6">
                 <div className="h-4 w-28 rounded-full bg-white/15" />
                 <div className="mt-4 h-7 w-4/5 rounded-lg bg-white/15" />
@@ -53,7 +53,7 @@ export default function VehicleLoading() {
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] bg-white p-6 shadow-panel">
+            <div className="border border-ink/15 bg-white p-6">
               <div className="skeleton h-5 w-28 animate-shimmer rounded-full" />
               <div className="skeleton mt-4 h-8 w-4/5 animate-shimmer rounded-lg" />
               <div className="mt-6 grid grid-cols-2 gap-3">
@@ -65,7 +65,7 @@ export default function VehicleLoading() {
           </div>
         </div>
 
-        <div className="skeleton mt-10 h-56 animate-shimmer rounded-[1.5rem]" />
+        <div className="skeleton mt-10 h-56 animate-shimmer" />
       </div>
 
       <div

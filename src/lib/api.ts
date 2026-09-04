@@ -8,8 +8,8 @@ export const ok = <T>(data: T, init?: ResponseInit) =>
 export const created = <T>(data: T) =>
   NextResponse.json({ data }, { status: 201 });
 
-export const fail = (message: string, status = 400) =>
-  NextResponse.json({ error: message }, { status });
+export const fail = (message: string, status = 400, headers?: HeadersInit) =>
+  NextResponse.json({ error: message }, { status, headers });
 
 export function handleRouteError(error: unknown) {
   if (error instanceof ZodError) {
@@ -18,7 +18,7 @@ export function handleRouteError(error: unknown) {
   }
 
   if (isHttpError(error)) {
-    return fail(error.message, error.status);
+    return fail(error.message, error.status, error.headers);
   }
 
   console.error(error);

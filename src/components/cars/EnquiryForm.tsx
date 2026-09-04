@@ -106,12 +106,12 @@ export function EnquiryForm({
       id="enquiry"
       onSubmit={onSubmit}
       aria-busy={isPending}
-      className="rounded-[1.5rem] border border-ink/10 bg-white p-5 shadow-panel sm:p-6"
+      className="border border-ink/15 bg-white p-5 sm:p-7"
     >
-      <p className="text-xs font-black uppercase tracking-[0.2em] text-copper">
+      <p className="border-l-8 border-racing pl-3 text-xs font-black uppercase tracking-[0.2em] text-racing">
         {content.eyebrow}
       </p>
-      <h2 className="mt-2 text-2xl font-black tracking-tight text-ink">{content.title}</h2>
+      <h2 className="mt-3 font-display text-3xl font-black uppercase leading-none tracking-[-0.02em] text-ink">{content.title}</h2>
       <p className="mt-2 text-sm leading-6 text-ink/60">{content.copy}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -127,7 +127,7 @@ export function EnquiryForm({
             maxLength={100}
             autoComplete="name"
             enterKeyHint="next"
-            className="mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-ink/15"
+            className="mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20"
           />
         </label>
         <label htmlFor={`${fieldId}-email`}>
@@ -143,7 +143,7 @@ export function EnquiryForm({
             autoComplete="email"
             inputMode="email"
             enterKeyHint="next"
-            className="mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-ink/15"
+            className="mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20"
           />
         </label>
         <label htmlFor={`${fieldId}-phone`} className="sm:col-span-2">
@@ -158,7 +158,7 @@ export function EnquiryForm({
             autoComplete="tel"
             inputMode="tel"
             enterKeyHint="next"
-            className="mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-ink/15"
+            className="mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20"
           />
         </label>
         <label htmlFor={`${fieldId}-message`} className="sm:col-span-2">
@@ -173,7 +173,7 @@ export function EnquiryForm({
             maxLength={2000}
             rows={4}
             defaultValue={`${content.message} ${carName}.`}
-            className="mt-2 w-full resize-y rounded-xl border border-ink/10 bg-smoke px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-ink/15"
+            className="mt-2 w-full resize-y border border-ink/20 bg-white px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20"
           />
         </label>
       </div>
@@ -184,8 +184,8 @@ export function EnquiryForm({
           aria-live={state === "error" ? "assertive" : "polite"}
           className={
             state === "success"
-              ? "mt-4 flex items-start gap-2 rounded-xl bg-racing/10 px-4 py-3 text-sm font-semibold leading-6 text-racing"
-              : "mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700"
+              ? "mt-4 flex items-start gap-2 border-l-4 border-emerald-600 bg-emerald-50 px-4 py-3 text-sm font-semibold leading-6 text-emerald-800"
+              : "mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700"
           }
         >
           {state === "success" ? (
@@ -198,7 +198,7 @@ export function EnquiryForm({
       <Button
         type="submit"
         disabled={isPending}
-        className="mt-5 w-full"
+        className="mt-5 w-full !border-racing !bg-racing uppercase tracking-[0.08em] hover:!border-copper hover:!bg-copper"
         icon={<Send className="h-4 w-4" />}
       >
         {isPending ? "Sending securely..." : content.button}

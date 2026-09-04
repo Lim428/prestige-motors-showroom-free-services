@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { KeyboardEvent } from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -24,6 +25,13 @@ type AlertStatus =
   | "UNSUBSCRIBED";
 type AlertType = "PRICE_DROP" | "NEW_STOCK" | "BOTH";
 type AlertChannel = "EMAIL" | "SMS" | "WHATSAPP";
+type AlertWorkspaceTab = "alerts" | "notifications";
+
+const alertWorkspaceTabs: AlertWorkspaceTab[] = ["alerts", "notifications"];
+const alertWorkspaceTabIds: Record<AlertWorkspaceTab, string> = {
+  alerts: "stock-alerts-tab",
+  notifications: "notifications-tab"
+};
 
 type StockAlertItem = {
   id: string;
@@ -63,7 +71,7 @@ const alertStatuses: AlertStatus[] = [
   "UNSUBSCRIBED"
 ];
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15 disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15 disabled:cursor-not-allowed disabled:opacity-50";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -193,7 +201,7 @@ function statusClassName(status: AlertStatus) {
 }
 
 export function AlertNotificationManager() {
-  const [tab, setTab] = useState<"alerts" | "notifications">("alerts");
+  const [tab, setTab] = useState<AlertWorkspaceTab>("alerts");
   const [alerts, setAlerts] = useState<StockAlertItem[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -355,11 +363,36 @@ export function AlertNotificationManager() {
     }
   }
 
+  function moveWorkspaceTabFocus(
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentTab: AlertWorkspaceTab
+  ) {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+
+    event.preventDefault();
+    const currentIndex = alertWorkspaceTabs.indexOf(currentTab);
+    const nextIndex =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? alertWorkspaceTabs.length - 1
+          : event.key === "ArrowRight"
+            ? (currentIndex + 1) % alertWorkspaceTabs.length
+            : (currentIndex - 1 + alertWorkspaceTabs.length) % alertWorkspaceTabs.length;
+    const nextTab = alertWorkspaceTabs[nextIndex];
+
+    setTab(nextTab);
+    window.requestAnimationFrame(() =>
+      document.getElementById(alertWorkspaceTabIds[nextTab])?.focus()
+    );
+  }
+
   return (
     <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h3 className="text-xl font-black text-ink">Alerts and notifications</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Retention</p>
+          <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Alerts and notifications</h3>
           <p className="mt-1 text-sm text-ink/65">
             Manage customer subscriptions and sales activity updates.
           </p>
@@ -368,7 +401,7 @@ export function AlertNotificationManager() {
           type="button"
           onClick={() => void loadData()}
           disabled={isLoading}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20 disabled:opacity-50"
+          className="inline-flex h-11 items-center justify-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20 disabled:opacity-50"
         >
           <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} aria-hidden="true" />
           Refresh
@@ -383,10 +416,12 @@ export function AlertNotificationManager() {
             role="tab"
             aria-selected={tab === "alerts"}
             aria-controls="stock-alerts-panel"
+            tabIndex={tab === "alerts" ? 0 : -1}
             onClick={() => setTab("alerts")}
+            onKeyDown={(event) => moveWorkspaceTabFocus(event, "alerts")}
             className={cn(
               "min-h-11 border-b-2 px-3 text-sm font-black outline-none focus:ring-2 focus:ring-ink/20",
-              tab === "alerts" ? "border-copper text-ink" : "border-transparent text-ink/55"
+              tab === "alerts" ? "border-signal text-ink" : "border-transparent text-ink/55"
             )}
           >
             Stock alerts <span className="ml-1 text-xs">{alerts.length}</span>
@@ -397,15 +432,17 @@ export function AlertNotificationManager() {
             role="tab"
             aria-selected={tab === "notifications"}
             aria-controls="notifications-panel"
+            tabIndex={tab === "notifications" ? 0 : -1}
             onClick={() => setTab("notifications")}
+            onKeyDown={(event) => moveWorkspaceTabFocus(event, "notifications")}
             className={cn(
               "min-h-11 border-b-2 px-3 text-sm font-black outline-none focus:ring-2 focus:ring-ink/20",
-              tab === "notifications" ? "border-copper text-ink" : "border-transparent text-ink/55"
+              tab === "notifications" ? "border-signal text-ink" : "border-transparent text-ink/55"
             )}
           >
             Notifications
             {unreadCount > 0 ? (
-              <span className="ml-2 rounded-full bg-copper px-2 py-0.5 text-[11px] text-white">
+              <span className="ml-2 bg-signal px-2 py-0.5 text-[11px] text-white">
                 {unreadCount}
               </span>
             ) : null}
@@ -446,11 +483,11 @@ export function AlertNotificationManager() {
                       ? alertStatuses.filter((status) => status !== "PENDING_VERIFICATION")
                       : (["PENDING_VERIFICATION", "UNSUBSCRIBED"] as AlertStatus[]);
                 return (
-                  <article key={alert.id} aria-busy={pendingIds.has(alert.id)} className="rounded-md border border-ink/10 p-4 hover:border-ink/25">
+                  <article key={alert.id} aria-busy={pendingIds.has(alert.id)} className="border border-l-[3px] border-ink/15 border-l-signal p-4 transition hover:border-ink/35">
                     <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-black text-ink">{alert.name}</h4>
+                          <h4 className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">{alert.name}</h4>
                           <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-black uppercase", statusClassName(alert.status))}>{titleCase(alert.status)}</span>
                           <span className="rounded-full bg-smoke px-2.5 py-1 text-[11px] font-black uppercase text-ink/65">{titleCase(alert.type)}</span>
                         </div>
@@ -467,7 +504,7 @@ export function AlertNotificationManager() {
                           <span>{alert.verifiedAt ? `Verified: ${formatDate(alert.verifiedAt)}` : "Email not verified"}</span>
                         </div>
                         {alert.car?.slug ? (
-                          <Link href={`/cars/${alert.car.slug}`} className="mt-2 inline-flex min-h-9 items-center gap-1.5 rounded text-sm font-bold text-copper outline-none hover:underline focus:ring-2 focus:ring-ink/20">
+                          <Link href={`/cars/${alert.car.slug}`} className="mt-2 inline-flex min-h-9 items-center gap-1.5 text-sm font-bold text-signal outline-none hover:underline focus:ring-2 focus:ring-signal/20">
                             {alert.car.label}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                           </Link>
                         ) : null}
@@ -504,15 +541,15 @@ export function AlertNotificationManager() {
           ) : loadErrors.notifications ? (
             <ErrorState title="Notifications unavailable" message={loadErrors.notifications} onRetry={loadData} />
           ) : filteredNotifications.length > 0 ? (
-            <div className="mt-3 divide-y divide-ink/10 overflow-hidden rounded-md border border-ink/10">
+            <div className="mt-3 divide-y divide-ink/10 overflow-hidden border border-ink/15">
               {filteredNotifications.map((notification) => (
-                <article key={notification.id} aria-busy={pendingIds.has(notification.id)} className={cn("flex flex-col gap-3 p-4 sm:flex-row sm:items-start", notification.readAt ? "bg-white" : "bg-champagne/10")}>
-                  <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-full", notification.readAt ? "bg-smoke text-ink/45" : "bg-copper text-white")}>
+                <article key={notification.id} aria-busy={pendingIds.has(notification.id)} className={cn("flex flex-col gap-3 border-l-[3px] p-4 sm:flex-row sm:items-start", notification.readAt ? "border-l-transparent bg-white" : "border-l-signal bg-signal/5")}>
+                  <span className={cn("grid h-10 w-10 shrink-0 place-items-center border", notification.readAt ? "border-ink/10 bg-smoke text-ink/45" : "border-signal bg-signal text-white")}>
                     <Bell className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-black text-ink">{notification.title}</h4>
+                      <h4 className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">{notification.title}</h4>
                       <span className="text-[11px] font-black uppercase tracking-wide text-ink/45">{titleCase(notification.type)}</span>
                     </div>
                     <p className="mt-1 text-sm leading-6 text-ink/70">{notification.message}</p>
@@ -521,11 +558,11 @@ export function AlertNotificationManager() {
                   </div>
                   <div className="flex shrink-0 flex-wrap items-center gap-2">
                     {notification.actionUrl ? (
-                      <Link href={notification.actionUrl} className="inline-flex h-10 items-center gap-1.5 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20">
+                      <Link href={notification.actionUrl} className="inline-flex h-10 items-center gap-1.5 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20">
                         Open<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                       </Link>
                     ) : null}
-                    <button type="button" onClick={() => void toggleRead(notification)} disabled={pendingIds.has(notification.id)} className="inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-bold text-ink/70 outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20 disabled:opacity-50">
+                    <button type="button" onClick={() => void toggleRead(notification)} disabled={pendingIds.has(notification.id)} className="inline-flex h-10 items-center gap-2 border border-transparent px-3 text-sm font-bold text-ink/70 outline-none hover:border-ink/15 hover:bg-smoke focus:ring-2 focus:ring-signal/20 disabled:opacity-50">
                       {pendingIds.has(notification.id) ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <CheckCheck className="h-4 w-4" aria-hidden="true" />}
                       Mark {notification.readAt ? "unread" : "read"}
                     </button>
@@ -543,13 +580,13 @@ export function AlertNotificationManager() {
 }
 
 function LoadingState({ label }: { label: string }) {
-  return <div role="status" className="mt-3 grid min-h-64 place-items-center rounded-md border border-dashed border-ink/15 bg-smoke/30 text-center"><div><Loader2 className="mx-auto h-7 w-7 animate-spin text-copper" aria-hidden="true" /><p className="mt-3 text-sm font-bold text-ink/60">{label}</p></div></div>;
+  return <div role="status" className="mt-3 grid min-h-64 place-items-center border border-dashed border-ink/20 bg-smoke/30 text-center"><div><Loader2 className="mx-auto h-7 w-7 animate-spin text-signal" aria-hidden="true" /><p className="mt-3 text-sm font-bold text-ink/60">{label}</p></div></div>;
 }
 
 function ErrorState({ title, message, onRetry }: { title: string; message: string; onRetry: () => void }) {
-  return <div role="alert" className="mt-3 grid min-h-64 place-items-center rounded-md border border-red-200 bg-red-50/50 px-5 text-center"><div><h4 className="font-black text-red-900">{title}</h4><p className="mt-1 text-sm text-red-800">{message}</p><button type="button" onClick={onRetry} className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"><RefreshCw className="h-4 w-4" aria-hidden="true" />Try again</button></div></div>;
+  return <div role="alert" className="mt-3 grid min-h-64 place-items-center border border-red-200 border-l-4 border-l-red-600 bg-red-50/50 px-5 text-center"><div><h4 className="font-display text-lg font-black uppercase tracking-wide text-red-900">{title}</h4><p className="mt-1 text-sm text-red-800">{message}</p><button type="button" onClick={onRetry} className="mt-4 inline-flex h-11 items-center gap-2 border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"><RefreshCw className="h-4 w-4" aria-hidden="true" />Try again</button></div></div>;
 }
 
 function EmptyState({ icon, title, message }: { icon: React.ReactNode; title: string; message: string }) {
-  return <div className="mt-3 grid min-h-64 place-items-center rounded-md border border-dashed border-ink/20 bg-smoke/25 px-5 text-center"><div className="text-ink/30">{icon}<h4 className="mt-3 font-black text-ink">{title}</h4><p className="mt-1 text-sm text-ink/60">{message}</p></div></div>;
+  return <div className="mt-3 grid min-h-64 place-items-center border border-dashed border-ink/25 bg-smoke/25 px-5 text-center"><div className="text-ink/30">{icon}<h4 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-ink">{title}</h4><p className="mt-1 text-sm text-ink/60">{message}</p></div></div>;
 }

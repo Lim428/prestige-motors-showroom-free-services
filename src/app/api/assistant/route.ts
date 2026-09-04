@@ -5,26 +5,33 @@ import {
   getAssistantCars,
   type AssistantModeReason
 } from "@/lib/assistant";
+import { enforceRateLimit } from "@/lib/engagement/rate-limit";
 import { assistantRequestSchema } from "@/lib/validators";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const windowMs = 60_000;
-const maxRequests = 20;
-const maxBuckets = 5_000;
-const buckets = new Map<string, { count: number; resetAt: number }>();
-let lastCleanupAt = 0;
-
 export async function POST(request: Request) {
   try {
-    const ip = clientIp(request);
-
-    if (!allowRequest(ip)) {
-      return fail("Please wait a moment before asking again.", 429);
+    // The local visual catalog intentionally runs without a database. Every
+    // deployed environment still uses the shared database-backed limiter.
+    if (process.env.NODE_ENV === "production" || process.env.SHOWROOM_PREVIEW !== "true") {
+      await enforceRateLimit(request, "assistant", {
+        limit: 20,
+        windowMs: 60_000,
+        message: "Please wait a moment before asking again."
+      });
     }
 
-    const payload = assistantRequestSchema.parse(await request.json());
+    let requestBody: unknown;
+
+    try {
+      requestBody = await request.json();
+    } catch {
+      return fail("Invalid JSON request payload.", 400);
+    }
+
+    const payload = assistantRequestSchema.parse(requestBody);
     const cars = await getAssistantCars();
     let reason: AssistantModeReason = "not_configured";
 
@@ -40,13 +47,17 @@ export async function POST(request: Request) {
       }
     } catch (error) {
       reason = "provider_error";
-      console.error(
-        "Assistant AI provider failed:",
-        error instanceof Error ? error.message : "Unknown provider error"
-      );
+      console.error("Assistant AI provider failed.", {
+        errorType: error instanceof Error ? error.name : "UnknownError"
+      });
     }
 
-    const reply = buildFallbackReply(payload.message, cars);
+    const reply = buildFallbackReply(
+      payload.message,
+      cars,
+      payload.locale,
+      payload.history
+    );
 
     return ok({
       reply,
@@ -73,48 +84,4 @@ function referencedCarIds(
     )
     .map((car) => car.id)
     .slice(0, 4);
-}
-
-function clientIp(request: Request) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "anonymous"
-  );
-}
-
-function allowRequest(key: string) {
-  const now = Date.now();
-
-  if (now - lastCleanupAt >= windowMs) {
-    for (const [bucketKey, bucketValue] of buckets) {
-      if (bucketValue.resetAt <= now) {
-        buckets.delete(bucketKey);
-      }
-    }
-
-    lastCleanupAt = now;
-  }
-
-  const bucket = buckets.get(key);
-
-  if (!bucket || bucket.resetAt <= now) {
-    if (buckets.size >= maxBuckets) {
-      const oldestKey = buckets.keys().next().value;
-
-      if (oldestKey) {
-        buckets.delete(oldestKey);
-      }
-    }
-
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-
-  if (bucket.count >= maxRequests) {
-    return false;
-  }
-
-  bucket.count += 1;
-  return true;
 }

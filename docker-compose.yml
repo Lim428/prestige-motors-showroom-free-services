@@ -30,9 +30,9 @@ services:
       ADMIN_EMAIL: admin@prestigemotors.local
       ADMIN_PASSWORD: ChangeThisAdminPassword!2026
       DEALER_NAME: Prestige Motors
-      DEALER_PHONE: "+15551234567"
-      DEALER_WHATSAPP: "+15551234567"
-      DEALER_EMAIL: sales@prestigemotors.local
+      DEALER_PHONE: "+60127270107"
+      DEALER_WHATSAPP: "60127270107"
+      DEALER_EMAIL: guozhanlim0428@gmail.com
       DEALER_ADDRESS: "${DEALER_ADDRESS:-}"
       DEALER_HOURS: "${DEALER_HOURS:-}"
       NEXT_PUBLIC_SITE_URL: http://localhost:3000

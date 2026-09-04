@@ -32,10 +32,10 @@ export async function GET(request: Request) {
     if (query.carId) {
       const car = await prisma.car.findUnique({
         where: { id: query.carId },
-        select: { id: true, status: true }
+        select: { id: true, status: true, isPublished: true }
       });
 
-      if (!car) {
+      if (!car || !car.isPublished) {
         return fail("Vehicle not found.", 404);
       }
       if (car.status !== "AVAILABLE") {
@@ -75,10 +75,17 @@ export async function POST(request: Request) {
         if (payload.carId) {
           const car = await transaction.car.findUnique({
             where: { id: payload.carId },
-            select: { id: true, status: true, brand: true, model: true, year: true }
+            select: {
+              id: true,
+              status: true,
+              isPublished: true,
+              brand: true,
+              model: true,
+              year: true
+            }
           });
 
-          if (!car) {
+          if (!car || !car.isPublished) {
             throw new HttpError(404, "Vehicle not found.");
           }
           if (car.status !== "AVAILABLE") {

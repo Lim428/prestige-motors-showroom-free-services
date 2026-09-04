@@ -8,15 +8,20 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
+    if (process.env.SHOWROOM_PREVIEW === "true") {
+      analyticsEventInputSchema.parse(await request.json());
+      return ok({ accepted: true, id: "preview" }, { status: 202 });
+    }
+
     await enforceRateLimit(request, "analytics", { limit: 120, windowMs: 60_000 });
     const payload = analyticsEventInputSchema.parse(await request.json());
 
     if (payload.carId) {
       const car = await prisma.car.findUnique({
         where: { id: payload.carId },
-        select: { id: true }
+        select: { id: true, isPublished: true }
       });
-      if (!car) {
+      if (!car || !car.isPublished) {
         return fail("Vehicle not found.", 404);
       }
     }

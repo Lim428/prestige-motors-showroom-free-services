@@ -132,21 +132,21 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
     <section
       aria-labelledby={`${id}-title`}
       className={cn(
-        "overflow-hidden rounded-[1.75rem] border border-ink/10 bg-white shadow-panel",
+        "overflow-hidden border border-ink/15 bg-white",
         className
       )}
     >
-      <div className="bg-[linear-gradient(135deg,#0f5847_0%,#173d35_100%)] p-5 text-white sm:p-7">
+      <div className="border-b-8 border-racing bg-ink p-5 text-white sm:p-7">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/12 text-champagne ring-1 ring-white/15">
+            <span className="grid h-11 w-11 shrink-0 place-items-center border border-white/25 bg-racing text-white">
               <ShieldCheck className="h-6 w-6" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-champagne">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-white/60">
                 Vehicle trust pack
               </p>
-              <h2 id={`${id}-title`} className="mt-2 text-2xl font-black tracking-tight">
+              <h2 id={`${id}-title`} className="mt-3 font-display text-3xl font-black uppercase leading-none tracking-[-0.02em]">
                 Evidence before promises
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
@@ -155,7 +155,7 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
             </div>
           </div>
           {profile?.inspectionStatus === "VERIFIED" ? (
-            <span className="inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-white px-3 py-2 text-xs font-black text-racing">
+            <span className="inline-flex shrink-0 items-center gap-2 self-start border border-emerald-400/40 bg-emerald-50 px-3 py-2 text-xs font-black uppercase tracking-[0.05em] text-emerald-800">
               <BadgeCheck className="h-4 w-4" aria-hidden="true" />
               Verified profile
             </span>
@@ -167,17 +167,17 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
         {isLoading ? (
           <div className="grid gap-3 sm:grid-cols-2" aria-label="Loading trust details" aria-busy="true">
             {[0, 1, 2, 3].map((item) => (
-              <div key={item} className="h-28 animate-pulse rounded-2xl bg-smoke" />
+              <div key={item} className="h-28 animate-pulse border border-ink/10 bg-smoke" />
             ))}
           </div>
         ) : error ? (
-          <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-semibold leading-6 text-red-700">
+          <div role="alert" className="border-l-4 border-red-700 bg-red-50 p-4 text-sm font-semibold leading-6 text-red-700">
             {error}
           </div>
         ) : !profile ? (
-          <div className="rounded-2xl border border-dashed border-ink/15 bg-smoke p-6 text-center">
-            <ClipboardCheck className="mx-auto h-8 w-8 text-copper" aria-hidden="true" />
-            <h3 className="mt-3 text-lg font-black text-ink">Trust profile being prepared</h3>
+          <div className="border border-dashed border-ink/25 bg-smoke p-6 text-center">
+            <ClipboardCheck className="mx-auto h-8 w-8 text-racing" aria-hidden="true" />
+            <h3 className="mt-3 font-display text-2xl font-black uppercase leading-none text-ink">Trust profile being prepared</h3>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-ink/55">
               Verified inspection and history information has not been published for this vehicle
               yet. Ask the showroom for the latest supporting records.
@@ -186,9 +186,16 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
         ) : (
           <>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-ink/10 bg-smoke p-4">
+              <div className="border border-ink/15 bg-smoke p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-racing">
+                  <span
+                    className={cn(
+                      "grid h-9 w-9 place-items-center border border-ink/15 bg-white",
+                      profile.inspectionStatus === "VERIFIED"
+                        ? "text-emerald-700"
+                        : "text-racing"
+                    )}
+                  >
                     <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
                   </span>
                   {profile.inspectionScore !== null ? (
@@ -201,8 +208,8 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-ink/10 bg-smoke p-4">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-racing">
+              <div className="border border-ink/15 bg-smoke p-4">
+                <span className="grid h-9 w-9 place-items-center border border-ink/15 bg-white text-racing">
                   <History className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <h3 className="mt-3 text-sm font-black text-ink">Service history</h3>
@@ -211,8 +218,8 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-ink/10 bg-smoke p-4">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-racing">
+              <div className="border border-ink/15 bg-smoke p-4">
+                <span className="grid h-9 w-9 place-items-center border border-ink/15 bg-white text-racing">
                   <Wrench className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <h3 className="mt-3 text-sm font-black text-ink">Warranty coverage</h3>
@@ -223,8 +230,8 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-ink/10 bg-smoke p-4">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-racing">
+              <div className="border border-ink/15 bg-smoke p-4">
+                <span className="grid h-9 w-9 place-items-center border border-ink/15 bg-white text-racing">
                   <Users className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <h3 className="mt-3 text-sm font-black text-ink">Ownership &amp; accident profile</h3>
@@ -246,19 +253,19 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
                 <div className="flex items-end justify-between gap-4">
                   <div>
                     <h3 className="flex items-center gap-2 text-lg font-black text-ink">
-                      <FileCheck2 className="h-5 w-5 text-copper" aria-hidden="true" />
+                      <FileCheck2 className="h-5 w-5 text-racing" aria-hidden="true" />
                       Verified documents
                     </h3>
                     <p className="mt-1 text-xs leading-5 text-ink/50">Only dealer-verified public documents appear here.</p>
                   </div>
-                  <span className="rounded-full bg-racing/10 px-2.5 py-1 text-xs font-black text-racing">
+                  <span className="border border-ink/15 bg-smoke px-2.5 py-1 text-xs font-black text-ink">
                     {data.documents.length}
                   </span>
                 </div>
-                <ul className="mt-4 divide-y divide-ink/10 rounded-xl border border-ink/10">
+                <ul className="mt-4 divide-y divide-ink/10 border border-ink/15">
                   {data.documents.map((document) => (
                     <li key={document.id} className="flex items-center gap-3 p-3 sm:p-4">
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-racing" aria-hidden="true" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-black text-ink">{document.title}</p>
                         <p className="mt-0.5 text-xs text-ink/45">
@@ -270,7 +277,7 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
                         href={document.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex h-9 items-center justify-center rounded-lg border border-ink/10 bg-smoke px-3 text-xs font-black text-ink transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing"
+                        className="inline-flex h-9 items-center justify-center border border-ink/20 bg-smoke px-3 text-xs font-black uppercase tracking-[0.05em] text-ink transition hover:border-racing hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing"
                       >
                         Open<span className="sr-only"> {document.title}</span>
                       </a>
@@ -286,7 +293,7 @@ export function TrustPack({ carId, vehicleName, className }: TrustPackProps) {
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => trackGrowthEvent("TRUST_REPORT_DOWNLOADED", { carId: data?.car.id ?? carId })}
-                className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-racing px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/30 focus-visible:ring-offset-2"
+                className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-racing px-5 text-sm font-black uppercase tracking-[0.08em] text-white transition hover:bg-copper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/30 focus-visible:ring-offset-2"
               >
                 <Download className="h-4 w-4" aria-hidden="true" />
                 Open full inspection report

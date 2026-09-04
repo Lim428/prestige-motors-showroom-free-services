@@ -276,8 +276,10 @@ async function main() {
   });
 
   const existingCars = await prisma.car.count();
+  const shouldSeedDemoInventory =
+    process.env.NODE_ENV !== "production" || process.env.SEED_DEMO_CARS === "true";
 
-  if (existingCars === 0) {
+  if (existingCars === 0 && shouldSeedDemoInventory) {
     for (const car of cars) {
       const slug = slugify(`${car.year} ${car.brand} ${car.model}`);
 
@@ -296,6 +298,8 @@ async function main() {
           description: car.description,
           features: [...car.features],
           status: car.status,
+          // Demo inventory is opt-in in production; when enabled it should be visible.
+          isPublished: true,
           images: {
             create: car.images.map((item) => ({ ...item }))
           }

@@ -34,11 +34,11 @@ export async function POST(request: Request) {
     const watchedCar = payload.carId
       ? await prisma.car.findUnique({
           where: { id: payload.carId },
-          select: { id: true, status: true }
+          select: { id: true, status: true, isPublished: true }
         })
       : null;
 
-    if (payload.carId && !watchedCar) {
+    if (payload.carId && (!watchedCar || !watchedCar.isPublished)) {
       return fail("Vehicle not found.", 404);
     }
 

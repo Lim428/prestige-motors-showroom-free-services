@@ -2,7 +2,8 @@ import { clsx, type ClassValue } from "clsx";
 
 const placeholderValuePattern =
   /^(?:your(?:[-_\s]|$)|replace(?:[-_\s]|$)|change[-_\s]?this|todo\b|tbd\b|example\b)/i;
-const defaultDealerPhone = "+60312345678";
+const defaultDealerPhone = "+60127270107";
+const defaultDealerEmail = "guozhanlim0428@gmail.com";
 
 function configuredValue(value: string | undefined) {
   const normalized = value?.trim();
@@ -47,15 +48,14 @@ export function dealerName() {
 }
 
 export function dealerEmail() {
-  const email = configuredValue(process.env.DEALER_EMAIL);
+  const email = configuredValue(process.env.DEALER_EMAIL) ?? defaultDealerEmail;
 
   if (
-    !email ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
     /\.(?:local|invalid)$/i.test(email) ||
     /@example\.(?:com|org|net)$/i.test(email)
   ) {
-    return null;
+    return defaultDealerEmail;
   }
 
   return email;
@@ -81,19 +81,49 @@ export function dealerPhoneDisplay() {
     : phone;
 }
 
-export function siteUrl() {
-  const rawUrl =
-    process.env.NEXTAUTH_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : undefined) ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "http://localhost:3000";
-  const url = rawUrl.trim().replace(/\/+$/, "");
+function normalizedSiteOrigin(value: string | undefined) {
+  const configured = configuredValue(value);
 
-  if (/^https?:\/\//i.test(url)) {
-    return url;
+  if (!configured) {
+    return null;
   }
 
-  return `https://${url}`;
+  const candidate = /^https?:\/\//i.test(configured) ? configured : `https://${configured}`;
+
+  try {
+    const parsed = new URL(candidate);
+
+    if (
+      !["http:", "https:"].includes(parsed.protocol) ||
+      !parsed.hostname ||
+      parsed.username ||
+      parsed.password ||
+      (process.env.NODE_ENV === "production" && parsed.protocol !== "https:")
+    ) {
+      return null;
+    }
+
+    return parsed.origin;
+  } catch {
+    return null;
+  }
+}
+
+export function siteUrl() {
+  const configuredOrigin =
+    normalizedSiteOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
+    normalizedSiteOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
+    normalizedSiteOrigin(process.env.NEXTAUTH_URL);
+
+  if (configuredOrigin) {
+    return configuredOrigin;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL or NEXTAUTH_URL must be configured as a valid HTTPS origin."
+    );
+  }
+
+  return "http://localhost:3000";
 }

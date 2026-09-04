@@ -28,7 +28,7 @@ type EnquiryStatusFilter = "ALL" | EnquiryStatus;
 
 const statuses: EnquiryStatus[] = ["NEW", "CONTACTED", "CLOSED", "ARCHIVED"];
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15";
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -194,9 +194,10 @@ export function EnquiryManager({
 
   return (
     <div>
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h2 className="text-lg font-black text-ink">Customer enquiries</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Inbox</p>
+          <h2 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Customer enquiries</h2>
           <p className="mt-1 text-sm text-ink/65">
             {filteredEnquiries.length} of {enquiries.length} enquiries shown
           </p>
@@ -220,7 +221,7 @@ export function EnquiryManager({
                 type="button"
                 onClick={() => setQuery("")}
                 aria-label="Clear enquiry search"
-                className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-md text-ink/60 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-ink/20"
+                className="absolute right-1 top-1 grid h-9 w-9 place-items-center text-ink/60 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-signal/20"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -265,14 +266,14 @@ export function EnquiryManager({
                 key={enquiry.id}
                 aria-busy={isPending}
                 className={cn(
-                  "rounded-md border bg-white p-4 transition hover:border-ink/25",
-                  isArchived ? "border-ink/10 bg-zinc-50/70" : "border-ink/10"
+                  "border border-l-[3px] bg-white p-4 transition hover:border-ink/35",
+                  isArchived ? "border-ink/10 border-l-ink/20 bg-zinc-50/70" : "border-ink/15 border-l-signal"
                 )}
               >
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-base font-black text-ink">
+                      <h3 className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">
                         {enquiry.name}
                       </h3>
                       <StatusBadge status={enquiry.status} />
@@ -301,7 +302,7 @@ export function EnquiryManager({
                       {enquiry.car ? (
                         <Link
                           href={`/cars/${enquiry.car.slug}`}
-                          className="inline-flex min-h-9 items-center gap-2 rounded font-bold text-copper outline-none hover:text-ink hover:underline focus:ring-2 focus:ring-ink/20"
+                          className="inline-flex min-h-9 items-center gap-2 font-bold text-signal outline-none hover:text-ink hover:underline focus:ring-2 focus:ring-signal/20"
                         >
                           {enquiry.car.year} {enquiry.car.brand}{" "}
                           {enquiry.car.model}
@@ -391,7 +392,7 @@ export function EnquiryManager({
                         type="button"
                         onClick={() => updateStatus(enquiry, "CONTACTED")}
                         disabled={isPending}
-                        className="inline-flex h-11 items-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink/70 outline-none transition hover:border-ink/30 hover:bg-smoke focus:ring-2 focus:ring-ink/20 disabled:opacity-45"
+                        className="inline-flex h-11 items-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink/70 outline-none transition hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20 disabled:opacity-45"
                       >
                         <ArchiveRestore
                           className="h-4 w-4"
@@ -404,7 +405,7 @@ export function EnquiryManager({
                         type="button"
                         onClick={() => updateStatus(enquiry, "ARCHIVED")}
                         disabled={isPending}
-                        className="inline-flex h-11 items-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink/70 outline-none transition hover:border-ink/30 hover:bg-smoke focus:ring-2 focus:ring-ink/20 disabled:opacity-45"
+                        className="inline-flex h-11 items-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink/70 outline-none transition hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20 disabled:opacity-45"
                       >
                         <Archive className="h-4 w-4" aria-hidden="true" />
                         Archive
@@ -418,7 +419,7 @@ export function EnquiryManager({
                             type="button"
                             onClick={() => setConfirmDeleteId(null)}
                             disabled={isPending}
-                            className="h-11 rounded-md px-3 text-sm font-bold text-ink/70 outline-none hover:bg-ink/5 focus:ring-2 focus:ring-ink/20"
+                            className="h-11 border border-transparent px-3 text-sm font-bold text-ink/70 outline-none hover:border-ink/15 hover:bg-ink/5 focus:ring-2 focus:ring-signal/20"
                           >
                             Cancel
                           </button>
@@ -426,7 +427,7 @@ export function EnquiryManager({
                             type="button"
                             onClick={() => remove(enquiry)}
                             disabled={isPending}
-                            className="h-11 rounded-md bg-red-700 px-3 text-sm font-bold text-white outline-none hover:bg-red-800 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 disabled:opacity-45"
+                            className="h-11 bg-red-700 px-3 text-sm font-black uppercase tracking-wide text-white outline-none hover:bg-red-800 focus:ring-2 focus:ring-red-400 focus:ring-offset-2 disabled:opacity-45"
                           >
                             Delete permanently
                           </button>
@@ -436,7 +437,7 @@ export function EnquiryManager({
                           type="button"
                           onClick={() => setConfirmDeleteId(enquiry.id)}
                           disabled={isPending}
-                          className="grid h-11 w-11 place-items-center rounded-md text-red-700 outline-none transition hover:bg-red-50 focus:ring-2 focus:ring-red-300 focus:ring-offset-2 disabled:opacity-45"
+                          className="grid h-11 w-11 place-items-center border border-transparent text-red-700 outline-none transition hover:border-red-200 hover:bg-red-50 focus:ring-2 focus:ring-red-300 focus:ring-offset-2 disabled:opacity-45"
                           aria-label={`Permanently delete ${enquiry.name}'s archived enquiry`}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden="true" />
@@ -449,13 +450,13 @@ export function EnquiryManager({
             );
           })
         ) : (
-          <div className="grid min-h-64 place-items-center rounded-md border border-dashed border-ink/20 bg-white px-5 py-10 text-center">
+          <div className="grid min-h-64 place-items-center border border-dashed border-ink/25 bg-white px-5 py-10 text-center">
             <div>
               <Inbox
                 className="mx-auto h-8 w-8 text-ink/35"
                 aria-hidden="true"
               />
-              <h3 className="mt-3 font-black text-ink">No matching enquiries</h3>
+              <h3 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-ink">No matching enquiries</h3>
               <p className="mt-1 text-sm text-ink/65">
                 Adjust the search or status filter to see more enquiries.
               </p>
@@ -465,7 +466,7 @@ export function EnquiryManager({
                   setQuery("");
                   onStatusFilterChange("ALL");
                 }}
-                className="mt-4 h-11 rounded-md border border-ink/15 px-4 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                className="mt-4 h-11 border border-ink/20 px-4 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
               >
                 Clear filters
               </button>

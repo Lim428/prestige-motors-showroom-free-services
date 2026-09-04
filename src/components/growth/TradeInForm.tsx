@@ -41,7 +41,7 @@ const MAX_IMAGES = 6;
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 const acceptedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const fieldClass =
-  "mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-racing/20";
+  "mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20";
 
 export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
   const id = useId();
@@ -213,20 +213,20 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
       onSubmit={onSubmit}
       aria-busy={phase !== "idle"}
       className={cn(
-        "overflow-hidden rounded-[1.75rem] border border-ink/10 bg-white shadow-panel",
+        "overflow-hidden border border-ink/15 bg-white",
         className
       )}
     >
-      <div className="bg-ink p-5 text-white sm:p-7">
+      <div className="border-b-8 border-racing bg-ink p-5 text-white sm:p-7">
         <div className="flex items-start gap-4">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-champagne text-ink">
+          <span className="grid h-11 w-11 shrink-0 place-items-center border border-white/25 bg-racing text-white">
             <CarFront className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-champagne">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-white/60">
               Upgrade with ease
             </p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Request a trade-in appraisal</h2>
+            <h2 className="mt-3 font-display text-3xl font-black uppercase leading-none tracking-[-0.02em]">Request a trade-in appraisal</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
               Share your vehicle&apos;s essentials and a few clear photos. Our team will review it
               before discussing an indicative value with you.
@@ -237,7 +237,7 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
 
       <div className="p-5 sm:p-7">
         <fieldset disabled={state === "success"}>
-          <legend className="text-lg font-black text-ink">Your vehicle</legend>
+          <legend className="font-display text-2xl font-black uppercase leading-none text-ink">Your vehicle</legend>
           <div className="mt-4 grid gap-5 sm:grid-cols-2">
             <label htmlFor={`${id}-make`}>
               <span className="text-sm font-bold text-ink/75">Make</span>
@@ -283,7 +283,7 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h3 className="flex items-center gap-2 text-lg font-black text-ink">
-                  <Camera className="h-5 w-5 text-copper" aria-hidden="true" />
+                  <Camera className="h-5 w-5 text-racing" aria-hidden="true" />
                   Vehicle photos
                 </h3>
                 <p id={`${id}-image-help`} className="mt-1 text-xs leading-5 text-ink/50">
@@ -296,15 +296,15 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
             {images.length > 0 ? (
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="Selected trade-in photos">
                 {images.map((image, index) => (
-                  <li key={image.id} className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-smoke">
+                  <li key={image.id} className="group relative aspect-[4/3] overflow-hidden border border-ink/15 bg-smoke">
                     <Image src={image.previewUrl} alt={`Selected vehicle photo ${index + 1}`} fill unoptimized className="object-cover" />
-                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-ink/90 to-transparent px-2 pb-2 pt-8">
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-white/20 bg-ink/90 p-2">
                       <span className="truncate text-[10px] font-bold text-white/80">{image.file.name}</span>
                       <button
                         type="button"
                         onClick={() => removeImage(image.id)}
                         aria-label={`Remove ${image.file.name}`}
-                        className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white text-ink transition hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        className="grid h-8 w-8 shrink-0 place-items-center bg-white text-ink transition hover:bg-racing hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
@@ -322,6 +322,7 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
               accept="image/jpeg,image/png,image/webp"
               multiple
               className="sr-only"
+              aria-label="Upload trade-in vehicle photos"
               aria-describedby={`${id}-image-help ${id}-image-message`}
               onChange={onChooseImages}
             />
@@ -329,9 +330,9 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={images.length >= MAX_IMAGES}
-              className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-dashed border-ink/25 bg-smoke px-4 text-sm font-black text-ink transition hover:border-ink/45 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 border border-dashed border-ink/30 bg-smoke px-4 text-sm font-black uppercase tracking-[0.06em] text-ink transition hover:border-racing hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <ImagePlus className="h-4 w-4 text-copper" aria-hidden="true" />
+              <ImagePlus className="h-4 w-4 text-racing" aria-hidden="true" />
               {images.length > 0 ? "Add more photos" : "Choose vehicle photos"}
             </button>
             <p id={`${id}-image-message`} role="alert" className="mt-2 text-xs font-semibold text-red-700">
@@ -340,7 +341,7 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
           </div>
 
           <div className="mt-7 border-t border-ink/10 pt-7">
-            <h3 className="text-lg font-black text-ink">Your contact details</h3>
+            <h3 className="font-display text-2xl font-black uppercase leading-none text-ink">Your contact details</h3>
             <div className="mt-4 grid gap-5 sm:grid-cols-2">
               <label htmlFor={`${id}-name`}>
                 <span className="text-sm font-bold text-ink/75">Your name</span>
@@ -358,13 +359,13 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
                 <span className="text-sm font-bold text-ink/75">
                   Vehicle notes <span className="font-normal text-ink/40">(optional)</span>
                 </span>
-                <textarea id={`${id}-notes`} name="notes" rows={4} maxLength={1500} placeholder="Service history, outstanding finance, modifications, accident history, or anything else we should know." className="mt-2 w-full resize-y rounded-xl border border-ink/10 bg-smoke px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-racing/20" />
+                <textarea id={`${id}-notes`} name="notes" rows={4} maxLength={1500} placeholder="Service history, outstanding finance, modifications, accident history, or anything else we should know." className="mt-2 w-full resize-y border border-ink/20 bg-white px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20" />
               </label>
             </div>
           </div>
 
-          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl bg-smoke p-4">
-            <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 rounded border-ink/20" />
+          <label className="mt-5 flex cursor-pointer items-start gap-3 border-l-4 border-ink bg-smoke p-4">
+            <input type="checkbox" name="consent" required className="mt-0.5 h-4 w-4 shrink-0 border-ink/20 accent-racing" />
             <span className="text-xs leading-5 text-ink/60">
               I confirm these details are accurate and agree that Prestige Motors may contact me
               about this appraisal. An online estimate is not a binding offer.
@@ -377,8 +378,8 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
             role={state === "error" ? "alert" : "status"}
             aria-live={state === "error" ? "assertive" : "polite"}
             className={cn(
-              "mt-5 flex items-start gap-2 rounded-xl px-4 py-3 text-sm font-semibold leading-6",
-              state === "success" ? "bg-racing/10 text-racing" : "bg-red-50 text-red-700"
+              "mt-5 flex items-start gap-2 border-l-4 px-4 py-3 text-sm font-semibold leading-6",
+              state === "success" ? "border-emerald-600 bg-emerald-50 text-emerald-800" : "border-red-700 bg-red-50 text-red-700"
             )}
           >
             {state === "success" ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /> : null}
@@ -389,7 +390,12 @@ export function TradeInForm({ className, onSuccess }: TradeInFormProps) {
         <button
           type="submit"
           disabled={phase !== "idle" || state === "success"}
-          className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-racing px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+          className={cn(
+            "mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 px-5 text-sm font-black uppercase tracking-[0.08em] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70",
+            state === "success"
+              ? "bg-emerald-700 focus-visible:ring-emerald-500/30"
+              : "bg-racing hover:bg-copper focus-visible:ring-racing/30"
+          )}
         >
           {phase === "uploading" ? (
             <UploadCloud className="h-4 w-4" aria-hidden="true" />

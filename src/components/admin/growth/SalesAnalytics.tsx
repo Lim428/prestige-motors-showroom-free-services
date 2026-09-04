@@ -206,9 +206,9 @@ export function SalesAnalytics() {
 
   if (isLoading && !dashboard) {
     return (
-      <div role="status" className="grid min-h-72 place-items-center rounded-md border border-dashed border-ink/15 bg-smoke/30 text-center">
+      <div role="status" className="grid min-h-72 place-items-center border border-dashed border-ink/20 bg-smoke/30 text-center">
         <div>
-          <Loader2 className="mx-auto h-7 w-7 animate-spin text-copper" aria-hidden="true" />
+          <Loader2 className="mx-auto h-7 w-7 animate-spin text-signal" aria-hidden="true" />
           <p className="mt-3 text-sm font-bold text-ink/60">Loading sales analytics</p>
         </div>
       </div>
@@ -217,11 +217,11 @@ export function SalesAnalytics() {
 
   if (error && !dashboard) {
     return (
-      <div role="alert" className="grid min-h-72 place-items-center rounded-md border border-red-200 bg-red-50/50 px-5 text-center">
+      <div role="alert" className="grid min-h-72 place-items-center border border-red-200 border-l-4 border-l-red-600 bg-red-50/50 px-5 text-center">
         <div>
-          <h3 className="font-black text-red-900">Analytics unavailable</h3>
+          <h3 className="font-display text-lg font-black uppercase tracking-wide text-red-900">Analytics unavailable</h3>
           <p className="mt-1 text-sm text-red-800">{error}</p>
-          <button type="button" onClick={() => void loadDashboard()} className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300">
+          <button type="button" onClick={() => void loadDashboard()} className="mt-4 inline-flex h-11 items-center gap-2 border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300">
             <RefreshCw className="h-4 w-4" aria-hidden="true" />Try again
           </button>
         </div>
@@ -242,9 +242,10 @@ export function SalesAnalytics() {
 
   return (
     <div aria-busy={isLoading}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h3 className="text-xl font-black text-ink">Sales analytics</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Performance</p>
+          <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Sales analytics</h3>
           <p className="mt-1 text-sm text-ink/65">
             Conversion activity across the last {dashboard.period.days || days} days
           </p>
@@ -252,26 +253,26 @@ export function SalesAnalytics() {
         <div className="flex gap-2">
           <label>
             <span className="sr-only">Analytics period</span>
-            <select value={days} onChange={(event) => setDays(Number(event.target.value) as 7 | 30 | 90)} className="h-11 rounded-md border border-ink/15 bg-white px-3 text-sm font-bold text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15">
+            <select value={days} onChange={(event) => setDays(Number(event.target.value) as 7 | 30 | 90)} className="h-11 border border-ink/20 bg-white px-3 text-sm font-bold text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15">
               <option value={7}>Last 7 days</option>
               <option value={30}>Last 30 days</option>
               <option value={90}>Last 90 days</option>
             </select>
           </label>
-          <button type="button" onClick={() => void loadDashboard()} disabled={isLoading} aria-label="Refresh analytics" className="grid h-11 w-11 place-items-center rounded-md border border-ink/15 text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20 disabled:opacity-50">
+          <button type="button" onClick={() => void loadDashboard()} disabled={isLoading} aria-label="Refresh analytics" className="grid h-11 w-11 place-items-center border border-ink/20 text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20 disabled:opacity-50">
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      {error ? <p role="alert" className="mt-3 rounded-md bg-red-50 p-3 text-sm font-bold text-red-800">{error}</p> : null}
+      {error ? <p role="alert" className="mt-3 border border-red-200 border-l-4 border-l-red-600 bg-red-50 p-3 text-sm font-bold text-red-800">{error}</p> : null}
 
       <div className="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-6">
         {metrics.map((metric) => {
           const Icon = metric.icon;
           return (
-            <div key={metric.label} className="rounded-md border border-ink/10 bg-smoke/25 p-4">
-              <Icon className="h-5 w-5 text-copper" aria-hidden="true" />
+            <div key={metric.label} className="border border-ink/15 border-t-[3px] border-t-signal bg-white p-4">
+              <Icon className="h-5 w-5 text-signal" aria-hidden="true" />
               <p className="mt-4 text-2xl font-black text-ink">{formatNumber(metric.value)}</p>
               <p className="mt-1 text-xs font-black uppercase tracking-wide text-ink/55">{metric.label}</p>
             </div>
@@ -280,12 +281,12 @@ export function SalesAnalytics() {
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-md border border-ink/10 p-4">
+        <div className="border border-ink/15 p-4">
           <p className="text-xs font-black uppercase tracking-wide text-ink/50">View to lead</p>
           <p className="mt-1 text-2xl font-black text-ink">{conversionRate(dashboard.totals.leads, dashboard.totals.vehicleViews)}</p>
           <p className="mt-1 text-sm text-ink/60">Visitors who became identifiable leads</p>
         </div>
-        <div className="rounded-md border border-ink/10 p-4">
+        <div className="border border-ink/15 p-4">
           <p className="text-xs font-black uppercase tracking-wide text-ink/50">Lead to appointment</p>
           <p className="mt-1 text-2xl font-black text-ink">{conversionRate(dashboard.totals.appointments, dashboard.totals.leads)}</p>
           <p className="mt-1 text-sm text-ink/60">Leads who booked a sales conversation</p>
@@ -293,37 +294,37 @@ export function SalesAnalytics() {
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-        <section aria-labelledby="activity-trend-title" className="rounded-md border border-ink/10 p-4">
+        <section aria-labelledby="activity-trend-title" className="border border-ink/15 p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
               <h4 id="activity-trend-title" className="font-black text-ink">Activity trend</h4>
               <p className="mt-1 text-xs text-ink/55">Daily events with lead markers</p>
             </div>
-            <TrendingUp className="h-5 w-5 text-copper" aria-hidden="true" />
+            <TrendingUp className="h-5 w-5 text-signal" aria-hidden="true" />
           </div>
           {dashboard.series.length > 0 ? (
             <div className="mt-6 flex h-56 items-end gap-1" aria-label="Daily analytics chart">
               {dashboard.series.map((point) => (
                 <div key={point.date} className="group relative flex h-full min-w-0 flex-1 items-end" title={`${shortDate(point.date)}: ${point.events} events, ${point.leads} leads`}>
-                  <div className="relative w-full rounded-t bg-ink/15 transition group-hover:bg-copper/50" style={{ height: `${Math.max(4, (point.events / maxDailyEvents) * 100)}%` }}>
-                    {point.leads > 0 ? <span className="absolute -top-2 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-copper" aria-hidden="true" /> : null}
+                  <div className="relative w-full bg-ink/15 transition group-hover:bg-signal/50" style={{ height: `${Math.max(4, (point.events / maxDailyEvents) * 100)}%` }}>
+                    {point.leads > 0 ? <span className="absolute -top-2 left-1/2 h-2 w-2 -translate-x-1/2 bg-signal" aria-hidden="true" /> : null}
                   </div>
                   <span className="sr-only">{shortDate(point.date)}: {point.events} events and {point.leads} leads</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="mt-6 rounded-md bg-smoke/50 p-6 text-center text-sm text-ink/55">Activity will appear after customers interact with the showroom.</p>
+            <p className="mt-6 border border-dashed border-ink/20 bg-smoke/50 p-6 text-center text-sm text-ink/55">Activity will appear after customers interact with the showroom.</p>
           )}
         </section>
 
-        <section aria-labelledby="funnel-title" className="rounded-md border border-ink/10 p-4">
+        <section aria-labelledby="funnel-title" className="border border-ink/15 p-4">
           <h4 id="funnel-title" className="font-black text-ink">Conversion funnel</h4>
           <div className="mt-4 grid gap-4">
             {dashboard.funnel.length > 0 ? dashboard.funnel.map((step) => (
               <div key={step.key}>
                 <div className="flex justify-between gap-3 text-sm"><span className="font-bold text-ink/70">{step.label}</span><span className="font-black text-ink">{formatNumber(step.count)}</span></div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-smoke"><div className="h-full rounded-full bg-copper" style={{ width: `${Math.max(2, (step.count / maxFunnel) * 100)}%` }} /></div>
+                <div className="mt-1.5 h-2 overflow-hidden bg-smoke"><div className="h-full bg-signal" style={{ width: `${Math.max(2, (step.count / maxFunnel) * 100)}%` }} /></div>
               </div>
             )) : <p className="text-sm text-ink/55">No funnel data yet.</p>}
           </div>
@@ -331,24 +332,24 @@ export function SalesAnalytics() {
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <section aria-labelledby="vehicles-title" className="rounded-md border border-ink/10 p-4">
+        <section aria-labelledby="vehicles-title" className="border border-ink/15 p-4">
           <h4 id="vehicles-title" className="font-black text-ink">Most-viewed vehicles</h4>
           <div className="mt-3 divide-y divide-ink/10">
             {dashboard.topVehicles.length > 0 ? dashboard.topVehicles.map((vehicle, index) => (
               <div key={vehicle.carId} className="flex items-center gap-3 py-3">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-smoke text-xs font-black text-ink/55">{index + 1}</span>
                 <div className="min-w-0 flex-1"><p className="truncate text-sm font-black text-ink">{vehicle.brand} {vehicle.model}</p><p className="text-xs text-ink/50">{formatNumber(vehicle.views)} views</p></div>
-                {vehicle.slug ? <Link href={`/cars/${vehicle.slug}`} aria-label={`View ${vehicle.brand} ${vehicle.model}`} className="rounded px-2 py-1 text-sm font-bold text-copper outline-none hover:underline focus:ring-2 focus:ring-ink/20">Open</Link> : null}
+                {vehicle.slug ? <Link href={`/cars/${vehicle.slug}`} aria-label={`View ${vehicle.brand} ${vehicle.model}`} className="px-2 py-1 text-sm font-bold text-signal outline-none hover:underline focus:ring-2 focus:ring-signal/20">Open</Link> : null}
               </div>
             )) : <p className="py-6 text-center text-sm text-ink/55">Vehicle rankings will appear after page views are recorded.</p>}
           </div>
         </section>
 
-        <section aria-labelledby="events-title" className="rounded-md border border-ink/10 p-4">
+        <section aria-labelledby="events-title" className="border border-ink/15 p-4">
           <h4 id="events-title" className="font-black text-ink">Event breakdown</h4>
           <div className="mt-3 grid grid-cols-2 gap-2">
             {dashboard.eventBreakdown.length > 0 ? dashboard.eventBreakdown.map((item) => (
-              <div key={item.event} className="rounded-md bg-smoke/55 p-3"><p className="text-lg font-black text-ink">{formatNumber(item.count)}</p><p className="mt-1 truncate text-[11px] font-black uppercase tracking-wide text-ink/50">{titleCase(item.event)}</p></div>
+              <div key={item.event} className="border border-ink/10 bg-smoke/55 p-3"><p className="text-lg font-black text-ink">{formatNumber(item.count)}</p><p className="mt-1 truncate text-[11px] font-black uppercase tracking-wide text-ink/50">{titleCase(item.event)}</p></div>
             )) : <p className="col-span-2 py-6 text-center text-sm text-ink/55">No event data yet.</p>}
           </div>
         </section>

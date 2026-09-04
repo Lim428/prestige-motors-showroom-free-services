@@ -60,7 +60,7 @@ const appointmentTypes: AppointmentType[] = [
 ];
 
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15 disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15 disabled:cursor-not-allowed disabled:opacity-50";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -269,7 +269,7 @@ export function AppointmentManager() {
   }, [loadAppointments]);
 
   const filteredAppointments = useMemo(() => {
-    return appointments
+    return [...appointments]
       .sort((left, right) => {
         const leftTime = new Date(left.startAt).getTime();
         const rightTime = new Date(right.startAt).getTime();
@@ -389,9 +389,10 @@ export function AppointmentManager() {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <h3 className="text-xl font-black text-ink">Appointments</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Calendar</p>
+          <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Appointments</h3>
           <p className="mt-1 text-sm text-ink/65">
             {filteredAppointments.length} of {totalAppointments} matching bookings shown
           </p>
@@ -432,7 +433,7 @@ export function AppointmentManager() {
           <button
             type="button"
             onClick={() => void loadAppointments(false)}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+            className="inline-flex h-11 items-center justify-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
           >
             <RefreshCw className="h-4 w-4" aria-hidden="true" />
             Refresh
@@ -455,12 +456,12 @@ export function AppointmentManager() {
               <article
                 key={appointment.id}
                 aria-busy={isPending}
-                className="rounded-md border border-ink/10 bg-white p-4 transition hover:border-ink/25"
+                className="border border-l-[3px] border-ink/15 border-l-signal bg-white p-4 transition hover:border-ink/35"
               >
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-black text-ink">{appointment.name}</h4>
+                      <h4 className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">{appointment.name}</h4>
                       <span
                         className={cn(
                           "rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wide",
@@ -475,7 +476,7 @@ export function AppointmentManager() {
                     </div>
 
                     <p className="mt-3 inline-flex items-start gap-2 text-sm font-black text-ink">
-                      <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-copper" aria-hidden="true" />
+                      <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-signal" aria-hidden="true" />
                       {formatSchedule(appointment)}
                     </p>
                     <p className="mt-1 inline-flex items-center gap-2 text-xs font-semibold text-ink/55">
@@ -506,7 +507,7 @@ export function AppointmentManager() {
                         appointment.car.slug ? (
                           <Link
                             href={`/cars/${appointment.car.slug}`}
-                            className="inline-flex min-h-9 items-center gap-1.5 rounded font-bold text-copper outline-none hover:underline focus:ring-2 focus:ring-ink/20"
+                            className="inline-flex min-h-9 items-center gap-1.5 font-bold text-signal outline-none hover:underline focus:ring-2 focus:ring-signal/20"
                           >
                             {appointment.car.label}
                             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
@@ -563,7 +564,7 @@ export function AppointmentManager() {
                       onClick={() => toggleDetails(appointment)}
                       aria-expanded={isExpanded}
                       aria-controls={`appointment-${appointment.id}-details`}
-                      className="h-11 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                      className="h-11 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
                     >
                       {isExpanded ? "Close details" : "Reschedule"}
                     </button>
@@ -618,7 +619,7 @@ export function AppointmentManager() {
                         }
                         rows={3}
                         placeholder="Preparation, customer requests or visit outcome"
-                        className="rounded-md border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15"
+                        className="border border-ink/20 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15"
                       />
                     </label>
                     <div className="flex justify-end sm:col-span-2">
@@ -626,7 +627,7 @@ export function AppointmentManager() {
                         type="button"
                         onClick={() => void saveDetails(appointment)}
                         disabled={isPending || !draft.date || !draft.time}
-                        className="inline-flex h-11 items-center gap-2 rounded-md bg-ink px-4 text-sm font-black text-white outline-none hover:bg-graphite focus:ring-2 focus:ring-ink/30 focus:ring-offset-2 disabled:opacity-50"
+                        className="inline-flex h-11 items-center gap-2 bg-ink px-4 text-sm font-black uppercase tracking-wide text-white outline-none hover:bg-signal focus:ring-2 focus:ring-signal/30 focus:ring-offset-2 disabled:opacity-50"
                       >
                         <Save className="h-4 w-4" aria-hidden="true" />
                         Save schedule
@@ -638,10 +639,10 @@ export function AppointmentManager() {
             );
           })
         ) : (
-          <div className="grid min-h-64 place-items-center rounded-md border border-dashed border-ink/20 bg-smoke/25 px-5 text-center">
+          <div className="grid min-h-64 place-items-center border border-dashed border-ink/25 bg-smoke/25 px-5 text-center">
             <div>
               <CalendarClock className="mx-auto h-8 w-8 text-ink/30" aria-hidden="true" />
-              <h4 className="mt-3 font-black text-ink">No appointments here</h4>
+              <h4 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-ink">No appointments here</h4>
               <p className="mt-1 text-sm text-ink/60">
                 Adjust the filters or wait for the next customer booking.
               </p>
@@ -651,7 +652,7 @@ export function AppointmentManager() {
                   setDateFilter("ALL");
                   setStatusFilter("ALL");
                 }}
-                className="mt-4 h-11 rounded-md border border-ink/15 bg-white px-4 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                className="mt-4 h-11 border border-ink/20 bg-white px-4 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
               >
                 Show all appointments
               </button>
@@ -665,9 +666,9 @@ export function AppointmentManager() {
 
 function AppointmentLoading() {
   return (
-    <div role="status" className="grid min-h-72 place-items-center rounded-md border border-dashed border-ink/15 bg-smoke/35 text-center">
+    <div role="status" className="grid min-h-72 place-items-center border border-dashed border-ink/20 bg-smoke/35 text-center">
       <div>
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-copper" aria-hidden="true" />
+        <Loader2 className="mx-auto h-7 w-7 animate-spin text-signal" aria-hidden="true" />
         <p className="mt-3 text-sm font-bold text-ink/65">Loading appointments</p>
       </div>
     </div>
@@ -682,15 +683,15 @@ function AppointmentError({
   onRetry: () => void;
 }) {
   return (
-    <div role="alert" className="grid min-h-72 place-items-center rounded-md border border-red-200 bg-red-50/50 px-5 text-center">
+    <div role="alert" className="grid min-h-72 place-items-center border border-red-200 border-l-4 border-l-red-600 bg-red-50/50 px-5 text-center">
       <div>
         <Clock3 className="mx-auto h-8 w-8 text-red-600" aria-hidden="true" />
-        <h3 className="mt-3 font-black text-red-900">Appointments unavailable</h3>
+        <h3 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-red-900">Appointments unavailable</h3>
         <p className="mt-1 text-sm text-red-800">{message}</p>
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"
+          className="mt-4 inline-flex h-11 items-center gap-2 border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           Try again

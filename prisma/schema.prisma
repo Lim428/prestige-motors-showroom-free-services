@@ -164,31 +164,44 @@ model User {
 }
 
 model Car {
-  id              String               @id @default(uuid())
-  slug            String               @unique
-  brand           String
-  model           String
-  year            Int
-  mileage         Int
-  transmission    Transmission
-  fuelType        FuelType
-  engine          String
-  price           Decimal              @db.Decimal(12, 2)
-  condition       String
-  description     String               @db.Text
-  features        String[]
-  status          CarStatus            @default(AVAILABLE)
-  images          CarImage[]
-  enquiries       Enquiry[]
-  leads           Lead[]
-  appointments    Appointment[]
-  stockAlerts     StockAlert[]
-  analyticsEvents AnalyticsEvent[]
-  priceHistory    PriceHistory[]
-  trustProfile    VehicleTrustProfile?
-  trustDocuments  TrustDocument[]
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  id               String               @id @default(uuid())
+  slug             String               @unique
+  stockCode        String?              @unique
+  brand            String
+  model            String
+  variant          String?
+  year             Int
+  registrationYear Int?
+  mileage          Int
+  bodyType         String?
+  exteriorColor    String?
+  interiorColor    String?
+  transmission     Transmission
+  fuelType         FuelType
+  engine           String
+  engineCc         Int?
+  seats            Int?
+  doors            Int?
+  drivetrain       String?
+  assemblyType     String?
+  showroomLocation String?
+  price            Decimal              @db.Decimal(12, 2)
+  condition        String
+  description      String               @db.Text
+  features         String[]
+  status           CarStatus            @default(AVAILABLE)
+  isPublished      Boolean              @default(false)
+  images           CarImage[]
+  enquiries        Enquiry[]
+  leads            Lead[]
+  appointments     Appointment[]
+  stockAlerts      StockAlert[]
+  analyticsEvents  AnalyticsEvent[]
+  priceHistory     PriceHistory[]
+  trustProfile     VehicleTrustProfile?
+  trustDocuments   TrustDocument[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 
   @@index([brand])
   @@index([year])
@@ -196,11 +209,15 @@ model Car {
   @@index([fuelType])
   @@index([transmission])
   @@index([status])
+  @@index([isPublished, status])
+  @@index([bodyType])
+  @@index([showroomLocation])
 }
 
 model CarImage {
   id        String   @id @default(uuid())
   url       String
+  publicId  String?
   altText   String
   width     Int
   height    Int

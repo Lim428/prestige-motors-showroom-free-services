@@ -87,7 +87,7 @@ const leadStatuses: LeadStatus[] = [
 ];
 
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15 disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15 disabled:cursor-not-allowed disabled:opacity-50";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -300,7 +300,7 @@ function statusClassName(status: LeadStatus) {
   if (status === "CONTACTED") {
     return "bg-violet-100 text-violet-800";
   }
-  return "bg-copper/10 text-copper";
+  return "bg-signal/10 text-signal";
 }
 
 export function LeadPipeline({
@@ -502,9 +502,10 @@ export function LeadPipeline({
 
   return (
     <div>
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <h3 className="text-xl font-black text-ink">Lead pipeline</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Sales desk</p>
+          <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Lead pipeline</h3>
           <p className="mt-1 text-sm text-ink/65">
             {filteredLeads.length} of {leads.length} leads shown
           </p>
@@ -544,7 +545,7 @@ export function LeadPipeline({
           <button
             type="button"
             onClick={() => void loadLeads()}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+            className="inline-flex h-11 items-center justify-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
           >
             <RefreshCw className="h-4 w-4" aria-hidden="true" />
             Refresh
@@ -567,12 +568,12 @@ export function LeadPipeline({
               <article
                 key={lead.id}
                 aria-busy={isPending}
-                className="rounded-md border border-ink/10 bg-white p-4 transition hover:border-ink/25"
+                className="border border-l-[3px] border-ink/15 border-l-signal bg-white p-4 transition hover:border-ink/35"
               >
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="text-base font-black text-ink">{lead.name}</h4>
+                      <h4 className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">{lead.name}</h4>
                       <span
                         className={cn(
                           "rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wide",
@@ -609,7 +610,7 @@ export function LeadPipeline({
                         lead.car.slug ? (
                           <Link
                             href={`/cars/${lead.car.slug}`}
-                            className="inline-flex min-h-9 items-center gap-1.5 rounded font-bold text-copper outline-none hover:underline focus:ring-2 focus:ring-ink/20"
+                            className="inline-flex min-h-9 items-center gap-1.5 font-bold text-signal outline-none hover:underline focus:ring-2 focus:ring-signal/20"
                           >
                             {lead.car.label}
                             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
@@ -680,7 +681,7 @@ export function LeadPipeline({
                       onClick={() => openLead(lead)}
                       aria-expanded={isExpanded}
                       aria-controls={`lead-${lead.id}-details`}
-                      className="h-11 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                      className="h-11 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
                     >
                       {isExpanded ? "Close details" : "Manage"}
                     </button>
@@ -695,10 +696,10 @@ export function LeadPipeline({
                     <div className="mb-5 grid gap-4 xl:grid-cols-2">
                       <section
                         aria-labelledby={`lead-${lead.id}-vehicles-heading`}
-                        className="rounded-md border border-ink/10 bg-smoke/30 p-4"
+                        className="border border-ink/15 bg-smoke/30 p-4"
                       >
                         <div className="flex items-center gap-2">
-                          <CarFront className="h-4 w-4 text-copper" aria-hidden="true" />
+                          <CarFront className="h-4 w-4 text-signal" aria-hidden="true" />
                           <h5
                             id={`lead-${lead.id}-vehicles-heading`}
                             className="text-sm font-black text-ink"
@@ -711,12 +712,12 @@ export function LeadPipeline({
                             {lead.preferredVehicles.map((vehicle) => (
                               <li
                                 key={vehicle.id}
-                                className="rounded-md border border-ink/10 bg-white px-3 py-2 text-sm"
+                                className="border border-ink/10 bg-white px-3 py-2 text-sm"
                               >
                                 {vehicle.slug && !vehicle.missing ? (
                                   <Link
                                     href={`/cars/${vehicle.slug}`}
-                                    className="inline-flex min-h-9 items-center gap-1.5 font-bold text-copper outline-none hover:underline focus:ring-2 focus:ring-ink/20"
+                                    className="inline-flex min-h-9 items-center gap-1.5 font-bold text-signal outline-none hover:underline focus:ring-2 focus:ring-signal/20"
                                   >
                                     {vehicle.label}
                                     <ExternalLink
@@ -753,10 +754,10 @@ export function LeadPipeline({
 
                       <section
                         aria-labelledby={`lead-${lead.id}-transcript-heading`}
-                        className="rounded-md border border-ink/10 bg-smoke/30 p-4"
+                        className="border border-ink/15 bg-smoke/30 p-4"
                       >
                         <div className="flex items-center gap-2">
-                          <Bot className="h-4 w-4 text-copper" aria-hidden="true" />
+                          <Bot className="h-4 w-4 text-signal" aria-hidden="true" />
                           <h5
                             id={`lead-${lead.id}-transcript-heading`}
                             className="text-sm font-black text-ink"
@@ -774,9 +775,9 @@ export function LeadPipeline({
                               <li
                                 key={`${message.role}-${index}`}
                                 className={cn(
-                                  "rounded-md border px-3 py-2",
+                                  "border px-3 py-2",
                                   message.role === "user"
-                                    ? "border-copper/20 bg-copper/5"
+                                    ? "border-signal/25 bg-signal/5"
                                     : "border-ink/10 bg-white"
                                 )}
                               >
@@ -860,7 +861,7 @@ export function LeadPipeline({
                           }
                           rows={3}
                           placeholder="Budget, vehicle preference and next best action"
-                          className="rounded-md border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15"
+                          className="border border-ink/20 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15"
                         />
                       </label>
                       <label className="grid gap-1.5 text-sm font-bold text-ink lg:col-span-2">
@@ -876,7 +877,7 @@ export function LeadPipeline({
                           }
                           rows={2}
                           placeholder="Add a timestamped internal note"
-                          className="rounded-md border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15"
+                          className="border border-ink/20 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15"
                         />
                       </label>
                     </div>
@@ -896,7 +897,7 @@ export function LeadPipeline({
                         type="button"
                         onClick={() => void saveFollowUp(lead)}
                         disabled={isPending}
-                        className="inline-flex h-11 items-center gap-2 rounded-md bg-ink px-4 text-sm font-black text-white outline-none hover:bg-graphite focus:ring-2 focus:ring-ink/30 focus:ring-offset-2 disabled:opacity-50"
+                        className="inline-flex h-11 items-center gap-2 bg-ink px-4 text-sm font-black uppercase tracking-wide text-white outline-none hover:bg-signal focus:ring-2 focus:ring-signal/30 focus:ring-offset-2 disabled:opacity-50"
                       >
                         <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
                         Save follow-up
@@ -926,10 +927,10 @@ function LoadingState({ label }: { label: string }) {
   return (
     <div
       role="status"
-      className="grid min-h-72 place-items-center rounded-md border border-dashed border-ink/15 bg-smoke/35 text-center"
+      className="grid min-h-72 place-items-center border border-dashed border-ink/20 bg-smoke/35 text-center"
     >
       <div>
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-copper" aria-hidden="true" />
+        <Loader2 className="mx-auto h-7 w-7 animate-spin text-signal" aria-hidden="true" />
         <p className="mt-3 text-sm font-bold text-ink/65">{label}</p>
       </div>
     </div>
@@ -940,15 +941,15 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
   return (
     <div
       role="alert"
-      className="grid min-h-72 place-items-center rounded-md border border-red-200 bg-red-50/50 px-5 text-center"
+      className="grid min-h-72 place-items-center border border-red-200 border-l-4 border-l-red-600 bg-red-50/50 px-5 text-center"
     >
       <div>
-        <h3 className="font-black text-red-900">Lead pipeline unavailable</h3>
+        <h3 className="font-display text-lg font-black uppercase tracking-wide text-red-900">Lead pipeline unavailable</h3>
         <p className="mt-1 text-sm text-red-800">{message}</p>
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"
+          className="mt-4 inline-flex h-11 items-center gap-2 border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300"
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           Try again
@@ -968,15 +969,15 @@ function EmptyState({
   onClear: () => void;
 }) {
   return (
-    <div className="grid min-h-64 place-items-center rounded-md border border-dashed border-ink/20 bg-smoke/25 px-5 text-center">
+    <div className="grid min-h-64 place-items-center border border-dashed border-ink/25 bg-smoke/25 px-5 text-center">
       <div>
         <UsersRound className="mx-auto h-8 w-8 text-ink/30" aria-hidden="true" />
-        <h4 className="mt-3 font-black text-ink">{title}</h4>
+        <h4 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-ink">{title}</h4>
         <p className="mt-1 max-w-md text-sm leading-6 text-ink/60">{message}</p>
         <button
           type="button"
           onClick={onClear}
-          className="mt-4 h-11 rounded-md border border-ink/15 bg-white px-4 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+          className="mt-4 h-11 border border-ink/20 bg-white px-4 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
         >
           Clear filters
         </button>

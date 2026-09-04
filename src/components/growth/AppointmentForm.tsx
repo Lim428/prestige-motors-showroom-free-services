@@ -35,7 +35,7 @@ type AppointmentSlot = {
 type FormState = "idle" | "success" | "error";
 
 const fieldClass =
-  "mt-2 h-12 w-full rounded-xl border border-ink/10 bg-smoke px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-racing/20 disabled:cursor-not-allowed disabled:opacity-55";
+  "mt-2 h-12 w-full border border-ink/20 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20 disabled:cursor-not-allowed disabled:bg-smoke disabled:opacity-55";
 
 function malaysiaToday() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -179,20 +179,20 @@ export function AppointmentForm({
       onSubmit={onSubmit}
       aria-busy={isPending}
       className={cn(
-        "overflow-hidden rounded-[1.75rem] border border-ink/10 bg-white shadow-panel",
+        "overflow-hidden border border-ink/15 bg-white",
         className
       )}
     >
-      <div className="bg-ink p-5 text-white sm:p-7">
+      <div className="border-b-8 border-racing bg-ink p-5 text-white sm:p-7">
         <div className="flex items-start gap-4">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-champagne text-ink">
+          <span className="grid h-11 w-11 shrink-0 place-items-center border border-white/25 bg-racing text-white">
             <CalendarCheck2 className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-champagne">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-white/60">
               Personal showroom visit
             </p>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">
+            <h2 className="mt-3 font-display text-3xl font-black uppercase leading-none tracking-[-0.02em]">
               {initialIntent === "finance" ? "Meet a vehicle and finance specialist" : "Book a test drive"}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/60">
@@ -209,7 +209,7 @@ export function AppointmentForm({
           <div className="grid gap-5 sm:grid-cols-2">
             <label htmlFor={`${id}-vehicle`} className="sm:col-span-2">
               <span className="flex items-center gap-2 text-sm font-bold text-ink/75">
-                <CarFront className="h-4 w-4 text-copper" aria-hidden="true" />
+                <CarFront className="h-4 w-4 text-racing" aria-hidden="true" />
                 Vehicle
               </span>
               <select
@@ -236,7 +236,7 @@ export function AppointmentForm({
 
             <label htmlFor={`${id}-date`}>
               <span className="flex items-center gap-2 text-sm font-bold text-ink/75">
-                <CalendarDays className="h-4 w-4 text-copper" aria-hidden="true" />
+                <CalendarDays className="h-4 w-4 text-racing" aria-hidden="true" />
                 Preferred date
               </span>
               <input
@@ -260,7 +260,7 @@ export function AppointmentForm({
 
             <label htmlFor={`${id}-time`}>
               <span className="flex items-center gap-2 text-sm font-bold text-ink/75">
-                <Clock3 className="h-4 w-4 text-copper" aria-hidden="true" />
+                <Clock3 className="h-4 w-4 text-racing" aria-hidden="true" />
                 Preferred time
               </span>
               <select
@@ -341,17 +341,17 @@ export function AppointmentForm({
                     : undefined
                 }
                 placeholder="For example: a trade-in, child seat space, or finance questions."
-                className="mt-2 w-full resize-y rounded-xl border border-ink/10 bg-smoke px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-ink/35 focus:border-ink/30 focus:bg-white focus-visible:ring-2 focus-visible:ring-racing/20"
+                className="mt-2 w-full resize-y border border-ink/20 bg-white px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-ink/35 hover:border-ink/35 focus:border-racing focus-visible:ring-2 focus-visible:ring-racing/20"
               />
             </label>
           </div>
 
-          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl bg-smoke p-4">
+          <label className="mt-5 flex cursor-pointer items-start gap-3 border-l-4 border-ink bg-smoke p-4">
             <input
               type="checkbox"
               name="consent"
               required
-              className="mt-0.5 h-4 w-4 shrink-0 rounded border-ink/20"
+              className="mt-0.5 h-4 w-4 shrink-0 border-ink/20 accent-racing"
             />
             <span className="text-xs leading-5 text-ink/60">
               I agree that Prestige Motors may contact me to arrange and confirm this appointment.
@@ -364,8 +364,8 @@ export function AppointmentForm({
             role={state === "error" ? "alert" : "status"}
             aria-live={state === "error" ? "assertive" : "polite"}
             className={cn(
-              "mt-5 flex items-start gap-2 rounded-xl px-4 py-3 text-sm font-semibold leading-6",
-              state === "success" ? "bg-racing/10 text-racing" : "bg-red-50 text-red-700"
+              "mt-5 flex items-start gap-2 border-l-4 px-4 py-3 text-sm font-semibold leading-6",
+              state === "success" ? "border-emerald-600 bg-emerald-50 text-emerald-800" : "border-red-700 bg-red-50 text-red-700"
             )}
           >
             {state === "success" ? (
@@ -378,7 +378,12 @@ export function AppointmentForm({
         <button
           type="submit"
           disabled={isPending || state === "success" || !date || !time}
-          className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-racing px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
+          className={cn(
+            "mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 px-5 text-sm font-black uppercase tracking-[0.08em] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70",
+            state === "success"
+              ? "bg-emerald-700 focus-visible:ring-emerald-500/30"
+              : "bg-racing hover:bg-copper focus-visible:ring-racing/30"
+          )}
         >
           {state === "success" ? (
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />

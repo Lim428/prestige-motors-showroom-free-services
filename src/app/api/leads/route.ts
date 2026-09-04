@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const vehicleIds = [...new Set(payload.vehicleIds)];
     const vehicles = vehicleIds.length
       ? await prisma.car.findMany({
-          where: { id: { in: vehicleIds } },
+          where: { id: { in: vehicleIds }, isPublished: true },
           select: { id: true, brand: true, model: true, year: true }
         })
       : [];

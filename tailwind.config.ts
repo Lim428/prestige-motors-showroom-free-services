@@ -9,26 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#171714",
-        graphite: "#272621",
-        smoke: "#f4f1e9",
-        porcelain: "#fbfaf7",
-        champagne: "#d4b56f",
-        copper: "#8f452a",
-        racing: "#0f5847",
-        muted: "#69675f",
-        line: "#ddd8cc"
+        ink: "#090909",
+        graphite: "#1b1b1b",
+        smoke: "#f1f1ed",
+        porcelain: "#ffffff",
+        champagne: "#e1121b",
+        copper: "#b50d15",
+        racing: "#e1121b",
+        signal: "#e1121b",
+        muted: "#66665f",
+        line: "#d9d9d3"
       },
       fontFamily: {
         display: [
+          "\"Oswald Variable\"",
           "\"Arial Narrow\"",
-          "\"Aptos Display\"",
           "\"Helvetica Neue\"",
           "Arial",
           "sans-serif"
         ],
         sans: [
-          "\"Aptos\"",
+          "\"Inter Variable\"",
           "\"Segoe UI\"",
           "ui-sans-serif",
           "system-ui",
@@ -36,9 +37,9 @@ const config: Config = {
         ]
       },
       boxShadow: {
-        lift: "0 28px 80px rgba(23, 23, 20, 0.14)",
-        panel: "0 14px 44px rgba(23, 23, 20, 0.07)",
-        soft: "0 6px 24px rgba(23, 23, 20, 0.06)"
+        lift: "0 20px 48px rgba(9, 9, 9, 0.16)",
+        panel: "0 8px 24px rgba(9, 9, 9, 0.08)",
+        soft: "0 4px 16px rgba(9, 9, 9, 0.06)"
       },
       keyframes: {
         "fade-up": {

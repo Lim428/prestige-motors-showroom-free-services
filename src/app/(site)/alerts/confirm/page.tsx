@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { BellRing, CheckCircle2, MailCheck, ShieldCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
-export const metadata: Metadata = {
-  title: "Confirm Vehicle Alert",
-  description: "Confirm your email address and activate a Prestige Motors vehicle alert.",
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("PageMetadata.alertConfirm");
+  return {
+    title: t("title"),
+    description: t("description"),
+    robots: { index: false, follow: false }
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -61,9 +65,15 @@ export default async function ConfirmAlertPage({
 
   return (
     <main className="grid min-h-[70vh] place-items-center px-4 py-14 sm:px-6">
-      <section className="w-full max-w-xl overflow-hidden rounded-[1.75rem] border border-ink/10 bg-white shadow-panel">
-        <div className="bg-ink p-6 text-white sm:p-8">
-          <span className="grid h-12 w-12 place-items-center rounded-xl bg-champagne text-ink">
+      <section className="w-full max-w-xl overflow-hidden border border-ink/15 bg-white">
+        <div className="border-b-8 border-racing bg-ink p-6 text-white sm:p-8">
+          <span
+            className={`grid h-12 w-12 place-items-center border text-white ${
+              completed
+                ? "border-emerald-400/40 bg-emerald-600"
+                : "border-white/25 bg-racing"
+            }`}
+          >
             {completed ? (
               <CheckCircle2 className="h-6 w-6" aria-hidden="true" />
             ) : expired ? (
@@ -72,10 +82,10 @@ export default async function ConfirmAlertPage({
               <MailCheck className="h-6 w-6" aria-hidden="true" />
             )}
           </span>
-          <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-champagne">
+          <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-white/60">
             Secure vehicle alerts
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">
+          <h1 className="mt-3 font-display text-4xl font-black uppercase leading-[0.95] tracking-[-0.02em]">
             {completed
               ? "Your vehicle alert is active."
               : expired
@@ -91,7 +101,7 @@ export default async function ConfirmAlertPage({
               selected contact preference.
             </p>
           ) : expired ? (
-            <p role="alert" className="rounded-xl bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
+            <p role="alert" className="border-l-4 border-amber-600 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
               For your security, confirmation links expire after 48 hours. Create a new alert to
               receive a fresh link.
             </p>
@@ -106,14 +116,14 @@ export default async function ConfirmAlertPage({
                 <input type="hidden" name="token" value={token} />
                 <button
                   type="submit"
-                  className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-racing px-5 text-sm font-black text-white transition hover:bg-racing/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/25 focus-visible:ring-offset-2"
+                  className="inline-flex min-h-12 w-full items-center justify-center bg-racing px-5 text-sm font-black uppercase tracking-[0.08em] text-white transition hover:bg-copper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing/25 focus-visible:ring-offset-2"
                 >
                   Confirm and activate alert
                 </button>
               </form>
             </>
           ) : (
-            <p role="alert" className="rounded-xl bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
+            <p role="alert" className="border-l-4 border-amber-600 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-900">
               This alert link is invalid or the request has already been stopped. Create a new
               alert if you still want vehicle updates.
             </p>
@@ -121,7 +131,7 @@ export default async function ConfirmAlertPage({
 
           <Link
             href="/#buyer-tools"
-            className="mt-5 inline-flex min-h-11 items-center text-sm font-black text-copper underline decoration-copper/30 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing"
+            className="mt-5 inline-flex min-h-11 items-center text-sm font-black text-racing underline decoration-racing/30 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing"
           >
             {expired ? "Create a new alert" : "Return to the showroom"}
           </Link>

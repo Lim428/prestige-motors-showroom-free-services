@@ -63,7 +63,7 @@ const tradeInStatuses: TradeInStatus[] = [
 ];
 
 const controlClassName =
-  "h-11 rounded-md border border-ink/15 bg-white px-3 text-sm text-ink outline-none transition focus:border-ink focus:ring-2 focus:ring-ink/15 disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 border border-ink/20 bg-white px-3 text-sm text-ink outline-none transition hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15 disabled:cursor-not-allowed disabled:opacity-50";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -374,9 +374,10 @@ export function TradeInManager() {
 
   return (
     <div>
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+      <div className="flex flex-col gap-3 border-b-2 border-ink pb-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <h3 className="text-xl font-black text-ink">Trade-in appraisals</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-signal">Acquisitions</p>
+          <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none tracking-wide text-ink">Trade-in appraisals</h3>
           <p className="mt-1 text-sm text-ink/65">
             {filteredTradeIns.length} of {tradeIns.length} submissions shown
           </p>
@@ -413,7 +414,7 @@ export function TradeInManager() {
           <button
             type="button"
             onClick={() => void loadTradeIns()}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+            className="inline-flex h-11 items-center justify-center gap-2 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
           >
             <RefreshCw className="h-4 w-4" aria-hidden="true" />
             Refresh
@@ -437,11 +438,11 @@ export function TradeInManager() {
               <article
                 key={tradeIn.id}
                 aria-busy={isPending}
-                className="rounded-md border border-ink/10 bg-white p-4 transition hover:border-ink/25"
+                className="border border-l-[3px] border-ink/15 border-l-signal bg-white p-4 transition hover:border-ink/35"
               >
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="flex min-w-0 flex-1 gap-3">
-                    <div className="relative hidden h-20 w-24 shrink-0 overflow-hidden rounded-md bg-smoke sm:block">
+                    <div className="relative hidden h-20 w-24 shrink-0 overflow-hidden bg-smoke sm:block">
                       {tradeIn.images[0] ? (
                         <Image
                           src={runtimeImageUrl(tradeIn.images[0].url)}
@@ -461,7 +462,7 @@ export function TradeInManager() {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h4 className="text-base font-black text-ink">{vehicleLabel}</h4>
+                        <h4 className="font-display text-lg font-black uppercase leading-none tracking-wide text-ink">{vehicleLabel}</h4>
                         <span
                           className={cn(
                             "rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-wide",
@@ -505,7 +506,7 @@ export function TradeInManager() {
                           Expected: <strong className="text-ink">{formatCurrency(tradeIn.expectedPrice)}</strong>
                         </span>
                         <span className="text-ink/60">
-                          Appraisal: <strong className="text-copper">{formatCurrency(tradeIn.appraisalAmount)}</strong>
+                          Appraisal: <strong className="text-signal">{formatCurrency(tradeIn.appraisalAmount)}</strong>
                         </span>
                       </div>
                       {errors[tradeIn.id] ? (
@@ -545,7 +546,7 @@ export function TradeInManager() {
                       onClick={() => toggleDetails(tradeIn)}
                       aria-expanded={isExpanded}
                       aria-controls={`trade-in-${tradeIn.id}-details`}
-                      className="h-11 rounded-md border border-ink/15 px-3 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                      className="h-11 border border-ink/20 px-3 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
                     >
                       {isExpanded ? "Close details" : "Appraise"}
                     </button>
@@ -562,7 +563,7 @@ export function TradeInManager() {
                             href={runtimeImageUrl(image.url)}
                             target="_blank"
                             rel="noreferrer"
-                            className="group relative aspect-[4/3] overflow-hidden rounded-md bg-smoke outline-none focus:ring-2 focus:ring-ink/30"
+                            className="group relative aspect-[4/3] overflow-hidden bg-smoke outline-none focus:ring-2 focus:ring-signal/30"
                           >
                             <Image
                               src={runtimeImageUrl(image.url)}
@@ -577,7 +578,7 @@ export function TradeInManager() {
                       </div>
                     ) : null}
                     <div className="grid gap-4 lg:grid-cols-2">
-                      <div className="rounded-md bg-smoke/60 p-3 text-sm leading-6 text-ink/70">
+                      <div className="border border-ink/10 bg-smoke/60 p-3 text-sm leading-6 text-ink/70">
                         <p className="font-black text-ink">Customer description</p>
                         <p className="mt-1 whitespace-pre-line">
                           {tradeIn.notes || "No additional description was supplied."}
@@ -622,7 +623,7 @@ export function TradeInManager() {
                             }
                             rows={4}
                             placeholder="Inspection findings, deductions and offer terms"
-                            className="rounded-md border border-ink/15 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none focus:border-ink focus:ring-2 focus:ring-ink/15"
+                            className="border border-ink/20 bg-white px-3 py-2 text-sm leading-6 text-ink outline-none hover:border-ink/35 focus:border-signal focus:ring-2 focus:ring-signal/15"
                           />
                         </label>
                         <div className="flex justify-end">
@@ -630,7 +631,7 @@ export function TradeInManager() {
                             type="button"
                             onClick={() => void saveAppraisal(tradeIn)}
                             disabled={isPending}
-                            className="inline-flex h-11 items-center gap-2 rounded-md bg-ink px-4 text-sm font-black text-white outline-none hover:bg-graphite focus:ring-2 focus:ring-ink/30 focus:ring-offset-2 disabled:opacity-50"
+                            className="inline-flex h-11 items-center gap-2 bg-ink px-4 text-sm font-black uppercase tracking-wide text-white outline-none hover:bg-signal focus:ring-2 focus:ring-signal/30 focus:ring-offset-2 disabled:opacity-50"
                           >
                             <Save className="h-4 w-4" aria-hidden="true" />
                             Save appraisal
@@ -644,10 +645,10 @@ export function TradeInManager() {
             );
           })
         ) : (
-          <div className="grid min-h-64 place-items-center rounded-md border border-dashed border-ink/20 bg-smoke/25 px-5 text-center">
+          <div className="grid min-h-64 place-items-center border border-dashed border-ink/25 bg-smoke/25 px-5 text-center">
             <div>
               <CarFront className="mx-auto h-8 w-8 text-ink/30" aria-hidden="true" />
-              <h4 className="mt-3 font-black text-ink">No trade-ins found</h4>
+              <h4 className="mt-3 font-display text-lg font-black uppercase tracking-wide text-ink">No trade-ins found</h4>
               <p className="mt-1 text-sm text-ink/60">
                 Adjust the filters or wait for a new customer appraisal request.
               </p>
@@ -657,7 +658,7 @@ export function TradeInManager() {
                   setQuery("");
                   setStatusFilter("ALL");
                 }}
-                className="mt-4 h-11 rounded-md border border-ink/15 bg-white px-4 text-sm font-bold text-ink outline-none hover:bg-smoke focus:ring-2 focus:ring-ink/20"
+                className="mt-4 h-11 border border-ink/20 bg-white px-4 text-sm font-bold text-ink outline-none hover:border-ink hover:bg-smoke focus:ring-2 focus:ring-signal/20"
               >
                 Clear filters
               </button>
@@ -671,9 +672,9 @@ export function TradeInManager() {
 
 function TradeInLoading() {
   return (
-    <div role="status" className="grid min-h-72 place-items-center rounded-md border border-dashed border-ink/15 bg-smoke/35 text-center">
+    <div role="status" className="grid min-h-72 place-items-center border border-dashed border-ink/20 bg-smoke/35 text-center">
       <div>
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-copper" aria-hidden="true" />
+        <Loader2 className="mx-auto h-7 w-7 animate-spin text-signal" aria-hidden="true" />
         <p className="mt-3 text-sm font-bold text-ink/65">Loading trade-in requests</p>
       </div>
     </div>
@@ -682,11 +683,11 @@ function TradeInLoading() {
 
 function TradeInError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div role="alert" className="grid min-h-72 place-items-center rounded-md border border-red-200 bg-red-50/50 px-5 text-center">
+    <div role="alert" className="grid min-h-72 place-items-center border border-red-200 border-l-4 border-l-red-600 bg-red-50/50 px-5 text-center">
       <div>
-        <h3 className="font-black text-red-900">Trade-ins unavailable</h3>
+        <h3 className="font-display text-lg font-black uppercase tracking-wide text-red-900">Trade-ins unavailable</h3>
         <p className="mt-1 text-sm text-red-800">{message}</p>
-        <button type="button" onClick={onRetry} className="mt-4 inline-flex h-11 items-center gap-2 rounded-md border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300">
+        <button type="button" onClick={onRetry} className="mt-4 inline-flex h-11 items-center gap-2 border border-red-300 bg-white px-4 text-sm font-bold text-red-900 outline-none focus:ring-2 focus:ring-red-300">
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
           Try again
         </button>

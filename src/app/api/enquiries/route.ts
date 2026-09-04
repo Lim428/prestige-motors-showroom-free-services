@@ -1,9 +1,13 @@
 import { created, fail, handleRouteError } from "@/lib/api";
 import { after } from "next/server";
+import { enforceRateLimit } from "@/lib/engagement/rate-limit";
 import { sendTransactionalEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { dealerEmail, dealerName } from "@/lib/utils";
 import { enquiryInputSchema } from "@/lib/validators";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (character) => {
@@ -21,15 +25,19 @@ function escapeHtml(value: string) {
 
 export async function POST(request: Request) {
   try {
+    await enforceRateLimit(request, "enquiry", {
+      limit: 10,
+      windowMs: 10 * 60_000
+    });
     const payload = enquiryInputSchema.parse(await request.json());
 
     if (payload.carId) {
       const car = await prisma.car.findUnique({
         where: { id: payload.carId },
-        select: { id: true }
+        select: { id: true, isPublished: true }
       });
 
-      if (!car) {
+      if (!car || !car.isPublished) {
         return fail("Vehicle not found.", 404);
       }
     }

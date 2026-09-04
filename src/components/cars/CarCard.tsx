@@ -1,101 +1,143 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Gauge, Fuel, CalendarDays, Settings2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { SaveCompareControls } from "@/components/growth/SaveCompareControls";
+import { vehicleModelLabel, vehicleName } from "@/lib/car-display";
 import type { SerializedCar } from "@/lib/cars";
 import { formatMileage, titleCaseEnum } from "@/lib/format";
 import { isRuntimeImage, runtimeImageUrl } from "@/lib/images";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { SaveCompareControls } from "@/components/growth/SaveCompareControls";
+
+const statusStyles = {
+  AVAILABLE: "bg-white text-ink",
+  RESERVED: "bg-racing text-white",
+  SOLD: "bg-ink text-white"
+} as const;
 
 export function CarCard({ car, priority = false }: { car: SerializedCar; priority?: boolean }) {
   const image = car.images[0];
-  const carName = `${car.year} ${car.brand} ${car.model}`;
+  const carName = vehicleName(car);
+  const modelLabel = vehicleModelLabel(car.model, car.variant);
+  const location = car.showroomLocation || "Prestige Motors showroom";
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-ink/10 bg-white shadow-panel transition duration-300 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lift motion-reduce:transition-none">
+    <article className="group grid border-b border-ink/20 bg-white transition-colors hover:bg-smoke/40 lg:grid-cols-[minmax(290px,37%)_minmax(0,1fr)]">
       <Link
         href={`/cars/${car.slug}`}
         aria-label={`View ${carName}`}
-        className="flex flex-1 flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-racing"
+        className="relative block aspect-[16/10] overflow-hidden bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-racing lg:aspect-auto lg:min-h-[105px]"
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-zinc-200">
-          {image ? (
-            <Image
-              src={runtimeImageUrl(image.url)}
-              alt={image.altText}
-              fill
-              unoptimized={isRuntimeImage(image.url)}
-              priority={priority}
-              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover transition duration-700 motion-safe:group-hover:scale-105 motion-reduce:transition-none"
-            />
-          ) : (
-            <div className="grid h-full place-items-center text-sm font-medium text-ink/65">
-              Photo coming soon
-            </div>
-          )}
-          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/45 to-transparent" />
-          <div className="absolute left-4 top-4">
-            <StatusBadge status={car.status} />
+        {image ? (
+          <Image
+            src={runtimeImageUrl(image.url)}
+            alt={image.altText}
+            fill
+            unoptimized={isRuntimeImage(image.url)}
+            priority={priority}
+            sizes="(min-width: 1280px) 34vw, (min-width: 1024px) 38vw, 100vw"
+            className="object-cover transition duration-700 motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
+          />
+        ) : (
+          <div className="grid h-full place-items-center bg-smoke px-6 text-center text-xs font-black uppercase tracking-[0.1em] text-ink/60">
+            Photography scheduled
           </div>
-          <span className="absolute bottom-4 left-4 rounded-full border border-white/25 bg-ink/75 px-3 py-1 text-xs font-bold text-white backdrop-blur">
-            {car.condition}
-          </span>
-        </div>
+        )}
+        <span
+          className={`absolute left-3 top-3 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] shadow-sm ${statusStyles[car.status]}`}
+        >
+          {titleCaseEnum(car.status)}
+        </span>
+        <span className="absolute bottom-3 left-3 bg-ink/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.1em] text-white">
+          {car.condition}
+        </span>
+      </Link>
 
-        <div className="flex flex-1 flex-col p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-copper">
-                {car.year} · {car.brand}
-              </p>
-              <h3 className="mt-2 text-xl font-black leading-tight tracking-[-0.02em] text-ink transition group-hover:text-copper">
-                {car.model}
-              </h3>
-            </div>
-            <p className="shrink-0 text-right text-lg font-black tracking-[-0.02em] text-ink">
-              {car.formattedPrice}
+      <div className="flex min-w-0 flex-col px-5 py-5 sm:px-6 lg:px-5 lg:py-3">
+        <div className="grid flex-1 items-center gap-5 sm:grid-cols-2 lg:grid-cols-[minmax(145px,1.35fr)_minmax(190px,1.05fr)_minmax(105px,0.75fr)_auto_auto] lg:gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.11em] text-ink/60">
+              {car.year} · {car.brand}
+            </p>
+            <h3 className="mt-1.5 text-lg font-black uppercase leading-tight tracking-[-0.02em] text-ink sm:text-xl">
+              <Link
+                href={`/cars/${car.slug}`}
+                className="transition hover:text-racing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing"
+              >
+                {modelLabel}
+              </Link>
+            </h3>
+            <p className="mt-1.5 text-xs font-medium text-ink/60">
+              {titleCaseEnum(car.transmission)} <span aria-hidden="true">·</span>{" "}
+              {titleCaseEnum(car.fuelType)}
+              {car.drivetrain ? (
+                <>
+                  {" "}<span aria-hidden="true">·</span> {car.drivetrain}
+                </>
+              ) : null}
             </p>
           </div>
 
-          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-ink/10 py-4 text-sm text-ink/75">
-            <div className="flex min-w-0 items-center gap-2">
-              <CalendarDays className="h-4 w-4 shrink-0 text-copper" aria-hidden="true" />
-              <dt className="sr-only">Year</dt>
-              <dd className="truncate">{car.year}</dd>
+          <dl className="grid grid-cols-2 gap-4 sm:col-span-2 lg:col-span-1 lg:gap-3">
+            <div>
+              <dt className="text-[9px] font-black uppercase tracking-[0.12em] text-ink/50">
+                Mileage
+              </dt>
+              <dd className="mt-1 text-sm font-semibold text-ink lg:text-xs">{formatMileage(car.mileage)}</dd>
             </div>
-            <div className="flex min-w-0 items-center gap-2">
-              <Gauge className="h-4 w-4 shrink-0 text-copper" aria-hidden="true" />
-              <dt className="sr-only">Mileage</dt>
-              <dd className="truncate">{formatMileage(car.mileage)}</dd>
-            </div>
-            <div className="flex min-w-0 items-center gap-2">
-              <Settings2 className="h-4 w-4 shrink-0 text-copper" aria-hidden="true" />
-              <dt className="sr-only">Transmission</dt>
-              <dd className="truncate">{titleCaseEnum(car.transmission)}</dd>
-            </div>
-            <div className="flex min-w-0 items-center gap-2">
-              <Fuel className="h-4 w-4 shrink-0 text-copper" aria-hidden="true" />
-              <dt className="sr-only">Fuel type</dt>
-              <dd className="truncate">{titleCaseEnum(car.fuelType)}</dd>
+            <div>
+              <dt className="text-[9px] font-black uppercase tracking-[0.12em] text-ink/50">
+                Location
+              </dt>
+              <dd className="mt-1 line-clamp-1 text-sm font-semibold text-ink lg:text-xs">{location}</dd>
             </div>
           </dl>
 
-          <div className="mt-auto flex min-h-12 items-end justify-between gap-4 pt-4">
-            <p className="line-clamp-1 text-sm text-ink/65">{car.engine}</p>
-            <span className="inline-flex shrink-0 items-center gap-1 text-sm font-black text-ink transition group-hover:text-copper">
-              View vehicle
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </span>
+          <div className="sm:text-right lg:text-left">
+            <p className="text-[9px] font-black uppercase tracking-[0.12em] text-ink/50">
+              Drive away price
+            </p>
+            <Link
+              href={`/cars/${car.slug}`}
+              className="mt-1 inline-block font-display text-2xl font-black uppercase tracking-[-0.025em] text-racing transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing lg:text-[1.7rem]"
+            >
+              {car.formattedPrice}
+            </Link>
           </div>
+
+          <SaveCompareControls
+            car={car}
+            compact
+            iconOnly
+            showCompareLink={false}
+            className="hidden shrink-0 lg:flex"
+          />
+
+          <Link
+            href={`/cars/${car.slug}`}
+            aria-label={`Open details for ${carName}`}
+            className="hidden h-11 w-11 items-center justify-center border border-ink/25 text-ink transition hover:border-racing hover:bg-racing hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-racing lg:inline-flex"
+          >
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          </Link>
         </div>
-      </Link>
-      <div className="border-t border-ink/10 px-5 py-4 sm:px-6">
-        <SaveCompareControls
-          car={car}
-          compact
-          showCompareLink={false}
-        />
+
+        <div className="mt-3 flex flex-col gap-3 border-t border-ink/10 pt-3 lg:hidden">
+          <p className="min-w-0 text-[10px] font-bold uppercase tracking-[0.08em] text-ink/50">
+            {[
+              car.stockCode ? `Stock ${car.stockCode}` : null,
+              car.bodyType,
+              car.exteriorColor,
+              car.engine
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+          <SaveCompareControls
+            car={car}
+            compact
+            showCompareLink={false}
+            className="shrink-0 [&_button]:!h-9 [&_button]:!min-h-9 [&_button]:!rounded-none [&_button]:!px-3 [&_button]:!text-xs"
+          />
+        </div>
       </div>
     </article>
   );

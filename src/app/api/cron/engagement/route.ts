@@ -160,7 +160,7 @@ export async function GET(request: Request) {
       status: { in: ["ACTIVE", "MATCHED"] },
       lastCheckedAt: null,
     },
-    include: { car: { select: { status: true } } },
+    include: { car: { select: { status: true, isPublished: true } } },
     orderBy: { createdAt: "asc" },
     take: stockAlertBatchSize,
   });
@@ -172,7 +172,7 @@ export async function GET(request: Request) {
             status: { in: ["ACTIVE", "MATCHED"] },
             lastCheckedAt: { not: null },
           },
-          include: { car: { select: { status: true } } },
+          include: { car: { select: { status: true, isPublished: true } } },
           orderBy: [{ lastCheckedAt: "asc" }, { createdAt: "asc" }],
           take: remainingAlertSlots,
         })
@@ -182,10 +182,10 @@ export async function GET(request: Request) {
   for (const alert of alerts) {
     try {
       const since = alert.lastMatchedAt ?? alert.createdAt;
-      const currentWatchedStatus = alert.carId ? (alert.car?.status ?? null) : null;
+      const currentWatchedStatus =
+        alert.carId && alert.car?.isPublished ? alert.car.status : null;
       const becameAvailable = Boolean(
         alert.carId &&
-          alert.lastKnownCarStatus &&
           alert.lastKnownCarStatus !== "AVAILABLE" &&
           currentWatchedStatus === "AVAILABLE",
       );
@@ -208,6 +208,7 @@ export async function GET(request: Request) {
       }
 
       const carWhere: Prisma.CarWhereInput = {
+        isPublished: true,
         status: "AVAILABLE",
         ...(alert.carId ? { id: alert.carId } : {}),
         ...(alert.brand

@@ -258,8 +258,11 @@ function validateAiProvider() {
     }
 
     if (name === "GEMINI_API_KEY" || name === "GOOGLE_API_KEY") {
-      if (!/^AIza[A-Za-z0-9_-]{20,}$/.test(value)) {
-        addIssue(name, "must look like a Google AI API key beginning with AIza.");
+      // AI Studio now issues service-account-bound authorization keys (AQ.),
+      // alongside legacy standard keys (AIza). Prefix checks must support both.
+      // https://ai.google.dev/gemini-api/docs/api-key
+      if (!/^(?:AIza[A-Za-z0-9_-]{20,}|AQ\.[A-Za-z0-9._~-]{20,})$/.test(value)) {
+        addIssue(name, "must be a Google AI Studio authorization key (AQ.) or standard key (AIza), without quotes or whitespace.");
         continue;
       }
     } else if (name === "AI_GATEWAY_API_KEY") {

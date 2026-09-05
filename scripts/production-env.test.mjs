@@ -58,6 +58,17 @@ test("complete optional settings pass without warnings", () => {
   assert.doesNotMatch(result.output, /Warning:/);
 });
 
+test("Google authorization keys are accepted alongside legacy standard keys", () => {
+  assert.equal(run({ GEMINI_API_KEY: `AQ.Ab_${randomSecret()}-${randomSecret()}` }).status, 0);
+  assert.equal(run({ GEMINI_API_KEY: "", GOOGLE_API_KEY: `AQ.Ab_${randomSecret()}` }).status, 0);
+});
+
+test("malformed Google credentials remain blocked", () => {
+  for (const key of ["AQ.short", "AIza-short", `AQ.${randomSecret()} injected`, `vck_${randomSecret()}`]) {
+    assert.equal(run({ GEMINI_API_KEY: key }).status, 1);
+  }
+});
+
 test("partially configured email fails regardless of which setting is missing", () => {
   for (const overrides of [
     { RESEND_API_KEY: `re_${randomSecret()}` },

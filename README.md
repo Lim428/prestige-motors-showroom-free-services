@@ -154,6 +154,8 @@ Configure all three Cloudinary credentials for production. Vercel's filesystem i
 
 Local and Preview builds may omit AI and Resend credentials. The Vercel Production build requires a Gemini or AI Gateway credential that passes format checks. Resend is optional, but both email settings must be valid if either is supplied. Format checks do not verify live provider access or sender-domain ownership.
 
+The validator supports both Google AI Studio authorization keys (`AQ.`) and legacy standard keys (`AIza`). Use a current authorization key for Gemini; see [Google's key migration guide](https://ai.google.dev/gemini-api/docs/api-key). Never replace a valid authorization key merely to satisfy an old prefix check.
+
 Never give secrets a `NEXT_PUBLIC_` prefix. `NEXT_PUBLIC_SITE_URL` is intentionally public; database, authentication, Cloudinary, Gemini, cron, and Resend credentials are not.
 
 ## Admin Access

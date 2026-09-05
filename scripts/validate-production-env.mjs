@@ -9,6 +9,7 @@ if (!isVercelProduction) {
 }
 
 const issues = [];
+const warnings = [];
 
 const placeholderPatterns = [
   /\blocalhost\b/i,
@@ -20,7 +21,7 @@ const placeholderPatterns = [
   /^(?:default|fake|sample|test)(?:[-_\s]|$)/i,
   /replace[-_\s]?with/i,
   /change[-_\s]?this/i,
-  /your[-_\s]?(?:verified[-_\s]?)?(?:domain|email|key|secret|password|value|cloud|name)/i,
+  /your[-_\s]?(?:verified[-_\s]?)?(?:domain|email|key|secret|password|value|cloud|name|address|hours)/i,
   /placeholder/i,
   /dummy/i,
   /postgres:postgres/i
@@ -323,16 +324,22 @@ validatePhone("DEALER_PHONE", "the public dealership contact");
 validatePhone("DEALER_WHATSAPP", "the public WhatsApp contact");
 validateEmail("DEALER_EMAIL", "the public dealership contact");
 
-const dealerAddress = requireValue("DEALER_ADDRESS", "the public dealership identity");
+// These details are hidden by the UI when not supplied. Do not invent a
+// location or schedule, or block the core showroom on optional contact copy.
+const dealerAddress = configured("DEALER_ADDRESS");
 
-if (dealerAddress && dealerAddress.length < 10) {
+if (dealerAddress && (isPlaceholder(dealerAddress) || dealerAddress.length < 10)) {
   addIssue("DEALER_ADDRESS", "must contain a complete customer-facing showroom address.");
+} else if (!dealerAddress) {
+  warnings.push("DEALER_ADDRESS is not configured; the showroom address stays hidden.");
 }
 
-const dealerHours = requireValue("DEALER_HOURS", "the public dealership identity");
+const dealerHours = configured("DEALER_HOURS");
 
-if (dealerHours && dealerHours.length < 4) {
+if (dealerHours && (isPlaceholder(dealerHours) || dealerHours.length < 4)) {
   addIssue("DEALER_HOURS", "must contain customer-facing opening hours.");
+} else if (!dealerHours) {
+  warnings.push("DEALER_HOURS is not configured; opening hours stay hidden.");
 }
 
 validateProductionOffFlag("SHOWROOM_PREVIEW", "preview inventory cannot replace live stock");
@@ -371,15 +378,27 @@ if (
 validateAiProvider();
 validateSecret("CRON_SECRET", 32, "the scheduled engagement endpoint");
 
-const resendApiKey = requireValue("RESEND_API_KEY", "transactional email delivery");
+const hasEmailConfiguration = configured("RESEND_API_KEY") || configured("ALERT_FROM_EMAIL");
 
-if (resendApiKey && !/^re_[A-Za-z0-9_-]{12,}$/.test(resendApiKey)) {
-  addIssue("RESEND_API_KEY", "must be a valid Resend API key beginning with re_.");
+if (hasEmailConfiguration) {
+  const resendApiKey = requireValue("RESEND_API_KEY", "transactional email delivery");
+
+  if (resendApiKey && !/^re_[A-Za-z0-9_-]{12,}$/.test(resendApiKey)) {
+    addIssue("RESEND_API_KEY", "must be a valid Resend API key beginning with re_.");
+  }
+
+  validateEmail("ALERT_FROM_EMAIL", "transactional email delivery", {
+    allowDisplayName: true
+  });
+} else {
+  warnings.push(
+    "Resend is not configured; submissions are saved, but automated email delivery is unavailable. Follow up through the admin workspace."
+  );
 }
 
-validateEmail("ALERT_FROM_EMAIL", "transactional email delivery", {
-  allowDisplayName: true
-});
+for (const warning of warnings) {
+  console.warn(`[production-env] Warning: ${warning}`);
+}
 
 if (issues.length > 0) {
   console.error(
@@ -396,6 +415,6 @@ if (issues.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    "[production-env] Production configuration is valid for Neon, authentication, public dealer identity, Cloudinary, AI, cron, and transactional email."
+    "[production-env] Required configuration checks passed for Neon, authentication, dealer contacts, Cloudinary, AI, and cron. Configured email settings were also checked; provider connectivity is not tested here."
   );
 }

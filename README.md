@@ -44,7 +44,7 @@ Finance results are estimates only and are not lending offers. Trust information
 
 Set `CRON_SECRET` in Vercel so scheduled requests can authenticate with `/api/cron/engagement`. Do not expose this endpoint secret in browser code.
 
-Resend delivery can be omitted for local and Preview environments. Vercel Production deployments require `RESEND_API_KEY` and a verified `ALERT_FROM_EMAIL` sender so leads, enquiries, appointments, trade-ins, and stock alerts have a working transactional-email path. Without Resend outside Production, submissions are still saved and surfaced to administrators for manual follow-up.
+Resend delivery is optional. Without it, submissions are still saved and surfaced to administrators for manual follow-up, but automatic confirmations, reminders, and stock-alert emails are unavailable. To enable delivery, configure both `RESEND_API_KEY` and a verified `ALERT_FROM_EMAIL` sender. Production builds warn when email is disabled and reject an incomplete or malformed email configuration.
 
 Email alerts are sent automatically when email delivery is configured. Selecting SMS or WhatsApp currently records the customer's preferred contact method and creates a manual-follow-up notification; the application does not send SMS or WhatsApp messages automatically until a compatible messaging provider is integrated.
 
@@ -125,8 +125,8 @@ Start from `.env.example`. Use separate secrets for local, preview, and producti
 | `DEALER_PHONE` | Customer-facing telephone number. |
 | `DEALER_WHATSAPP` | Customer-facing WhatsApp number, including country code. |
 | `DEALER_EMAIL` | Customer-facing and internal notification address. |
-| `DEALER_ADDRESS` | Complete customer-facing showroom address; required by the Production gate. |
-| `DEALER_HOURS` | Customer-facing opening hours; required by the Production gate. |
+| `DEALER_ADDRESS` | Optional confirmed showroom address; hidden from customers when omitted. |
+| `DEALER_HOURS` | Optional confirmed opening hours; hidden from customers when omitted. |
 | `CRON_SECRET` | Strong secret that protects the daily engagement endpoint. |
 
 `SHOWROOM_PREVIEW` and `SEED_DEMO_CARS` must be unset or `false` in customer Production. The validator rejects either flag when enabled so preview inventory and sample vehicles cannot leak into the live showroom.
@@ -152,7 +152,7 @@ Configure all three Cloudinary credentials for production. Vercel's filesystem i
 | `RESEND_API_KEY` | Server-side Resend key for transactional email delivery. |
 | `ALERT_FROM_EMAIL` | Resend sender in `Name <email@verified-domain>` format. |
 
-Local and Preview builds may omit AI and Resend credentials. The Vercel Production build requires one valid Gemini or AI Gateway credential plus a complete Resend sender configuration.
+Local and Preview builds may omit AI and Resend credentials. The Vercel Production build requires a Gemini or AI Gateway credential that passes format checks. Resend is optional, but both email settings must be valid if either is supplied. Format checks do not verify live provider access or sender-domain ownership.
 
 Never give secrets a `NEXT_PUBLIC_` prefix. `NEXT_PUBLIC_SITE_URL` is intentionally public; database, authentication, Cloudinary, Gemini, cron, and Resend credentials are not.
 
@@ -170,11 +170,11 @@ Customers see the showroom first; the admin login remains deliberately unobtrusi
 2. Create a Cloudinary account and add its three server-side credentials. Production uploads should not rely on local fallback storage.
 3. Import the GitHub repository into Vercel and add the production environment variables listed above.
 4. Set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to the final Vercel or custom-domain HTTPS origin.
-5. Add the confirmed `DEALER_NAME`, phone, WhatsApp, email, complete address, and opening hours. Do not publish invented location or schedule details.
+5. Add the confirmed `DEALER_NAME`, phone, WhatsApp, and email. Add the address and opening hours when confirmed; otherwise these stay hidden. Do not publish invented location or schedule details.
 6. Keep `SHOWROOM_PREVIEW` and `SEED_DEMO_CARS` unset or `false` in customer Production.
 7. Set a strong `CRON_SECRET`. Vercel uses it as the bearer token for the scheduled engagement request.
 8. Configure either Gemini or Vercel AI Gateway. Vercel normally injects `VERCEL_OIDC_TOKEN` for Gateway authentication; an explicit `AI_GATEWAY_API_KEY` is also supported.
-9. Configure Resend and verify the sender domain before setting `ALERT_FROM_EMAIL`.
+9. If automated email is needed, configure Resend and verify the sender domain before setting `ALERT_FROM_EMAIL`. Otherwise, leave both email settings unset and follow up from the admin workspace.
 10. Before promoting a release, run `npm run db:deploy` once against the intended Neon database. For a new database, run `npm run db:seed` once with `SEED_DEMO_CARS=false` to provision the administrator.
 11. Deploy and smoke-test the public enquiry, assistant, booking, trade-in, alert, and administrator flows.
 

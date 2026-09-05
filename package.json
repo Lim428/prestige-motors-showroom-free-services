@@ -13,6 +13,7 @@
     "i18n:smoke": "tsx scripts/i18n-smoke.ts",
     "assistant:smoke": "tsx scripts/assistant-smoke.ts",
     "validate:production-env": "node scripts/validate-production-env.mjs",
+    "test:production-env": "node --test scripts/production-env.test.mjs",
     "prisma:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",

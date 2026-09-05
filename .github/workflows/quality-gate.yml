@@ -72,5 +72,8 @@ jobs:
       - name: Check assistant fallback behavior
         run: npm run assistant:smoke
 
+      - name: Test production configuration gate
+        run: npm run test:production-env
+
       - name: Build production application
         run: npm run build
